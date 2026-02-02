@@ -8,11 +8,16 @@ tags:
 ---
 
 
-Tailscale makes secure networking easy, but how do you monitor its performance? In this guide, we’ll set up Prometheus to collect key Tailscale metrics and gain insights into your mesh VPN connections. Learn how to track bandwidth usage and ensure your network is running smoothly—all with open-source monitoring tools! 🚀
+Tailscale makes secure networking easy, but how do you monitor its performance? In this guide, we'll set up Prometheus to collect key Tailscale metrics and gain insights into your mesh VPN connections. Learn how to track bandwidth usage and ensure your network is running smoothly—all with open-source monitoring tools!
 
 !!! info "Requirements"
     Setting up Prometheus and Grafana is beyond the scope of this post. If you're interested in setting them up, check out this [guide].
 
+## Key Components
+
+1. Tailscale - Provides client metrics including network traffic, routes, and health status.
+2. Prometheus - Scrapes and stores time-series metrics from Tailscale's metrics endpoint.
+3. Grafana - Visualizes Tailscale metrics for monitoring your mesh VPN performance.
 
 ## Configure Tailscale
 Tailscale offers clients [metrics] which can scraped by Prometheus. These are metrics as the amount of advertised routes in case of a subnet router, throughput for in and outbound packets. Both direct traffic as via the Tailscale DERP relay. 
@@ -87,6 +92,13 @@ scrape_configs:
         target_label: instance
         replacement: '$1'
 ```
+
+**Configuration explained:**
+
+- **job_name**: Identifies this scrape job as 'tailscale' in Prometheus
+- **scrape_interval**: Collects metrics every 10 seconds (adjust based on your monitoring needs)
+- **targets**: The Tailscale metrics endpoint at port 5252 (replace `tailscale-ip` with your actual IP or MagicDNS name)
+- **relabel_configs**: Extracts the hostname from the target address and uses it as the instance label for cleaner metric identification
 
 ## Grafana Dashboard
 

@@ -1,11 +1,6 @@
 ---
 title: Unifi Syslog
-categories:
-- Network
-- Unifi
-date: 2026-01-29
 description: Send Unifi Syslog to Loki with Alloy
-draft: false
 tags:
 - unifi
 - loki
@@ -18,22 +13,28 @@ Unifi network devices generate valuable logs that can help you troubleshoot netw
 
 This guide we will only focus on device logs. Securtiy and firewall logs are out of scope.
 
-## Prerequisites
+## Key Components
 
-- Grafana Alloy installed (or can be deployed via Docker)
-- Grafana and Loki instance running (see my [Log Monitoring with Loki & Promtail] post)
-- Unifi Controller with network devices configured
+1. Grafana Alloy - Next-generation telemetry collector with native syslog receiver capabilities.
+2. Loki - Log aggregation system for storing and querying network device logs.
+3. Unifi Devices - Network hardware (APs, switches, gateways) generating syslog messages.
+4. Grafana - Visualization platform for exploring and analyzing collected logs.
 
-## Why Grafana Alloy?
-
-Grafana Alloy is the next-generation telemetry collector that replaces Promtail. It supports multiple data formats including logs, metrics, traces, and profiles. For syslog collection, Alloy provides:
-
-- Native syslog receiver (no need for external syslog daemons)
-- Powerful log processing and relabeling capabilities
-- Lower resource usage compared to traditional collectors
-- Unified configuration for all telemetry types
+!!! info "Prerequisites"
+    - Grafana Alloy installed (or can be deployed via Docker)
+    - Grafana and Loki instance running (see the [System Logs with Loki][loki-setup] guide)
+    - Unifi Controller with network devices configured
 
 ## Setup Grafana Alloy
+
+??? question "Why Grafana Alloy?"
+
+    Grafana Alloy is the next-generation telemetry collector that replaces Promtail. It supports multiple data formats including logs, metrics, traces, and profiles. For syslog collection, Alloy provides:
+
+    - Native syslog receiver (no need for external syslog daemons)
+    - Powerful log processing and relabeling capabilities
+    - Lower resource usage compared to traditional collectors
+    - Unified configuration for all telemetry types
 
 First, create a folder to hold the Docker Compose file and Alloy configuration:
 
@@ -264,8 +265,6 @@ You should see messages indicating that Alloy has started and the syslog listene
 
 Now configure your Unifi Controller to send syslog messages to Alloy.
 
-### Using Unifi Controller
-
 1. Open your Unifi Controller
 2. Navigate to **Settings** > **Cyber Secure**
 3. Go to  to **Traffic Logging**
@@ -317,4 +316,3 @@ With Grafana Alloy configured to receive Unifi syslog messages, you now have cen
 
 The modern Alloy architecture provides better performance and more flexible log processing compared to traditional syslog daemons, while integrating seamlessly with the Grafana ecosystem.
 
-[log-monitoring-with-loki-promtail]: {{< ref "/posts/2024-06-24-log-monitoring-with" >}}

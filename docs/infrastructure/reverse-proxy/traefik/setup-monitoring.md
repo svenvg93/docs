@@ -15,10 +15,10 @@ Traefik exposes metrics on EntryPoints, Routers, Services, and more. This guide 
 1. Traefik - Exposes metrics for monitoring various components of your services.
 2. Prometheus - Scrapes and stores metrics data from Traefik, providing a time-series database for easy access.
 3. Loki - Aggregates log data, allowing for centralized logging alongside metrics.
-4. Promtail - Ships logs from your applications to Loki for efficient storage and querying.
+4. Grafana Alloy - Ships logs from your applications to Loki for efficient storage and querying.
 
 !!! info "Prerequisites"
-    This guide assumes you already have Grafana, Prometheus, Promtail, and Loki set up. See the [Host & Container Monitoring][grafana-prometheus] and [System Logs with Loki][promtail-loki] guides for setup instructions.
+    This guide assumes you already have Grafana, Prometheus, Alloy, and Loki set up. See the [Host & Container Monitoring][grafana-prometheus] and [System Logs with Loki][alloy-loki] guides for setup instructions.
 
 ## Metrics
 
@@ -117,24 +117,47 @@ Re-create the Traefik container to apply the changes:
 docker compose -f traefik/docker-compose.yml up -d --force-recreate
 ```
 
-### Promtail
+### Grafana Alloy
 
-To enable Promtail to scrape Traefik logs, you’ll need to add a new scrape configuration to your `promtail-config.yaml`. Here’s how to do it:
+To enable Alloy to collect Traefik logs, you'll need to add a new file source configuration to your `config.alloy`. Add the following to your existing Alloy configuration:
 
-```yaml title="promtail.yml"
-scrape_configs:
-- job_name: traefik
-  static_configs:
-  - targets:
-      - traefik
-    labels:
-      job: traefik
-      __path__: /logs/traefik/*log
+```hcl title="config.alloy"
+// Traefik logs collection
+local.file_match "traefik" {
+  path_targets = [{
+    __path__ = "/var/log/traefik/*.log",
+  }]
+}
+
+loki.source.file "traefik" {
+  targets    = local.file_match.traefik.targets
+  forward_to = [loki.process.traefik.receiver]
+}
+
+loki.process "traefik" {
+  stage.static_labels {
+    values = {
+      job = "traefik",
+    }
+  }
+
+  forward_to = [loki.write.default.receiver]
+}
 ```
-After updating the configuration, you need to restart the Promtail service for the changes to take effect. Run the following command:
+
+**Note**: Ensure your Alloy `docker-compose.yml` has the Traefik log directory mounted:
+
+```yaml title="docker-compose.yml"
+volumes:
+  - ./config.alloy:/etc/alloy/config.alloy:ro
+  - /var/log:/var/log:ro  # This allows access to /var/log/traefik
+  - alloy-data:/var/lib/alloy/data
+```
+
+After updating the configuration, restart the Alloy service for the changes to take effect:
 
 ```bash
-docker restart promtail
+docker restart alloy
 ```
 
 ## Grafana Dashboard
@@ -151,6 +174,6 @@ You can either create a custom dashboard or use a pre-built one:
 Your monitoring setup is now complete. The dashboard provides insights into your Traefik instance's performance and helps identify issues quickly.
 
 [grafana-prometheus]: ../host-container-monitoring
-[promtail-loki]: ../system-logs-loki
+[alloy-loki]: ../system-logs-loki
 [here]: https://doc.traefik.io/traefik/observability/metrics/overview/#global-metrics
 [traefik dashboard]: https://github.com/svenvg93/Grafana-Dashboard/tree/master/traefik

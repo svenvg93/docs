@@ -1,6 +1,6 @@
 ---
 title: Wildcard SSL Certificates
-description: Generate valid wildcard SSL certificates for homelab services using local Unifi DNS, Traefik, and Cloudflare
+description: Generate valid wildcard SSL certificates for homelab services using local DNS, Traefik, and Cloudflare
 draft: false
 tags:
 - unifi
@@ -14,20 +14,26 @@ After recently installing a Unifi network in my homelab, I wanted a solution to 
 ## Setup Traefik
 For the initial Traefik and Cloudflare API setup, check out the [Setup & Configuration][install-setup] guide. 
 
-## Unifi Local DNS
-To route traffic from your local devices to Traefik, we need to create a DNS record in the Unifi system. Instead of creating individual records for each service, we'll use a wildcard DNS record. For this example, we'll use `*.lab.example.com`.
+## Local DNS Configuration
+To route traffic from your local devices to Traefik, you need to create a wildcard DNS record in your local DNS server. Instead of creating individual records for each service, a wildcard DNS record (e.g., `*.lab.example.com`) will route all subdomains to your Traefik instance, which handles SSL certificates and reverse proxy routing.
 
-### Create DNS Record
-In your Unifi controller:
+You can configure this in various DNS solutions:
 
-1. Navigate to **Settings** → **Policy Table**
-2. Click **Create New Policy**
-3. Select **DNS** as the policy type
-4. Enter the domain name: `*.lab.example.com`
-5. Enter the IP address of your server running Traefik
-6. Click **Add** to save
+- **Unifi**: Policy Table DNS records
+- **Pi-hole**: Local DNS Records
+- **AdGuard Home**: DNS rewrites
+- **pfSense/OPNsense**: Host overrides
+- **Router DNS**: Custom DNS entries (if supported)
 
-This wildcard record will route all subdomains under `lab.example.com` to your Traefik instance, which will then handle the SSL certificates and reverse proxy routing.
+??? example "Unifi Controller Setup"
+    In your Unifi controller:
+
+    1. Navigate to **Settings** → **Policy Table**
+    2. Click **Create New Policy**
+    3. Select **DNS** as the policy type
+    4. Enter the domain name: `*.lab.example.com`
+    5. Enter the IP address of your server running Traefik
+    6. Click **Add** to save
 
 ## Service Labels
 Traefik uses Docker labels to discover services and configure routing. Add the following labels to each container you want to expose through Traefik:
@@ -93,7 +99,7 @@ The `api@internal` service is a special Traefik service that routes to the built
 
 When you navigate to `portainer.lab.example.com` in your browser:
 
-1. **DNS Resolution**: Your Unifi DNS resolves the domain to your Traefik server's local IP address
+1. **DNS Resolution**: Your local DNS server resolves the domain to your Traefik server's local IP address
 2. **Traffic Routing**: Traefik receives the request and routes it to the appropriate container based on the host rule
 3. **SSL Certificate**: Traefik serves the connection with a valid wildcard SSL certificate obtained through Cloudflare's DNS challenge
 

@@ -9,61 +9,121 @@ tags:
 
 Monitoring your systems and containers is essential for maintaining a reliable homelab or home server. A popular setup involves Prometheus, Node Exporter, and cAdvisor for collecting metrics, combined with Grafana for creating insightful dashboards.
 
-In this guide, we’ll set up a complete monitoring solution by:
+In this guide, we'll set up a complete monitoring solution by:
 1.	Configuring Prometheus to scrape metrics from Node Exporter and cAdvisor.
 2.	Using Grafana to visualize the data with intuitive dashboards.
 
-Let’s dive in and build a robust monitoring stack!
+Let's dive in and build a robust monitoring stack!
 
-##  Setup Node Exporter & Cadvisor
+## Key Components
 
-To organize and store configuration files for monitoring, create dedicated folders for Node Exporter and cAdvisor.
+1. Node Exporter - Collects hardware and OS-level metrics from the host system (CPU, memory, disk, network).
+2. cAdvisor - Monitors container resource usage and performance metrics for Docker containers.
+3. Prometheus - Scrapes and stores time-series metrics from both Node Exporter and cAdvisor.
+4. Grafana - Provides visualization dashboards to analyze and monitor your system and container metrics.
 
-Run the following commands to create the required directories:
+!!! info "Prerequisites"
+    - Docker and Docker Compose installed on your system
+    - A Linux system with systemd (for Node Exporter service management)
+    - Root or sudo access for installing Node Exporter
+
+    If you need help setting up Docker, refer to the [official Docker documentation](https://docs.docker.com/get-docker/).
+
+##  Setup Node Exporter
+
+Node Exporter is installed natively on the host system to collect hardware and OS-level metrics without the overhead of containerization.
+
+**Download and install Node Exporter:**
+
+First, visit the [Node Exporter releases page](https://github.com/prometheus/node_exporter/releases) to find the latest version. At the time of writing, the latest version is 1.10.2.
 
 ```bash
-mkdir nodeexporter
+# Download Node Exporter
+cd /tmp
+wget https://github.com/prometheus/node_exporter/releases/download/v1.10.2/node_exporter-1.10.2.linux-amd64.tar.gz
+
+# Extract the archive
+tar xvfz node_exporter-1.10.2.linux-amd64.tar.gz
+
+# Move the binary to /usr/local/bin
+sudo mv node_exporter-1.10.2.linux-amd64/node_exporter /usr/local/bin/
+
+# Clean up
+rm -rf node_exporter-1.10.2.linux-amd64*
+```
+
+**Create a systemd service:**
+
+Create a dedicated user for Node Exporter:
+
+```bash
+sudo useradd --no-create-home --shell /bin/false node_exporter
+```
+
+Create the systemd service file:
+
+```bash
+sudo nano /etc/systemd/system/node_exporter.service
+```
+
+Add the following configuration:
+
+```ini title="node_exporter.service"
+[Unit]
+Description=Node Exporter
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+User=node_exporter
+Group=node_exporter
+Type=simple
+ExecStart=/usr/local/bin/node_exporter \
+    --collector.filesystem.mount-points-exclude='^/(sys|proc|dev|host|etc)($$|/)' \
+    --collector.netclass.ignored-devices='^(veth.*|br.*|docker.*|virbr.*|lo)$$'
+
+[Install]
+WantedBy=multi-user.target
+```
+
+**Configuration explained:**
+
+- **collector.filesystem.mount-points-exclude**: Prevents monitoring of virtual filesystems to avoid cluttering metrics with unnecessary data
+- **collector.netclass.ignored-devices**: Excludes virtual network interfaces (Docker bridges, veth pairs, etc.) from network metrics
+
+**Start and enable the service:**
+
+```bash
+# Reload systemd to recognize the new service
+sudo systemctl daemon-reload
+
+# Start Node Exporter
+sudo systemctl start node_exporter
+
+# Enable it to start on boot
+sudo systemctl enable node_exporter
+
+# Check the status
+sudo systemctl status node_exporter
+```
+
+Node Exporter is now running on port 9100 and collecting system metrics.
+
+## Setup cAdvisor
+
+cAdvisor runs as a Docker container to monitor other Docker containers. Create a dedicated folder for its configuration:
+
+```bash
 mkdir cadvisor
 ```
 
-Next, we’ll set up a docker-compose.yml` file in each folder to configure the respective services.
-
-### Node Exporter
-
-Open a new `docker-compose.yml` file for editing:
-
-```bash
-nano nodeexporter/docker-compose.yml
-```
-Paste the following content into the file:
-```yaml title="docker-compose.yml"
-services:
-  nodeexporter:
-    image: prom/node-exporter
-    container_name: nodeexporter
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    command:
-      - '--path.procfs=/host/proc'
-      - '--path.rootfs=/rootfs'
-      - '--path.sysfs=/host/sys'
-      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
-    restart: unless-stopped
-    network_mode: host
-```
-
-The `network_mode: host` setting allows Node Exporter to access the host network interfaces, enabling it to collect networking metrics.
-
-### cAdvisor
-
-Open a new `docker-compose.yml` file for editing:
+Create a `docker-compose.yml` file for cAdvisor:
 
 ```bash
 nano cadvisor/docker-compose.yml
 ```
-Paste the following content into the file:
+
+Add the following configuration:
 ```yaml title="docker-compose.yml"
 services:
   cadvisor:
@@ -80,7 +140,7 @@ services:
       - /sys:/sys:ro
       - /var/lib/docker:/var/lib/docker:ro
       - /cgroup:/cgroup:ro
-    command: 
+    command:
       - '--housekeeping_interval=15s'
       - '--docker_only=true'
     restart: unless-stopped
@@ -91,10 +151,17 @@ networks:
     name: backend
 ```
 
-Now that we have the configurations in place, we can start Node Exporter and cAdvisor by running the following commands:
+**Configuration explained:**
+
+- **privileged: true**: Required for cAdvisor to access low-level system information and container metrics
+- **devices**: Mounts kernel message device for system logging access
+- **volumes**: Mounts necessary host directories to monitor Docker containers and system resources
+- **housekeeping_interval**: Sets how often cAdvisor performs cleanup and metric collection (15 seconds)
+- **docker_only**: Limits monitoring to Docker containers only, reducing overhead from non-containerized processes
+
+Start cAdvisor:
 
 ```bash
-docker compose -f nodeexporter/docker-compose.yml up -d
 docker compose -f cadvisor/docker-compose.yml up -d
 ```
 
@@ -137,7 +204,7 @@ services:
       - 9090
     networks:
       - backend
-    extra_hosts:       
+    extra_hosts:
       - "host.docker.internal:host-gateway"
 
 networks:
@@ -148,6 +215,15 @@ volumes:
     prometheus:
       name: prometheus
 ```
+
+**Configuration explained:**
+
+- **volumes**: Mounts the Prometheus configuration file and creates persistent storage for time-series data
+- **config.file**: Specifies the location of the Prometheus configuration file
+- **storage.tsdb.path**: Directory where Prometheus stores its time-series database
+- **storage.tsdb.retention.size**: Maximum storage size (100GB) before oldest data is deleted
+- **web.enable-lifecycle**: Allows reloading configuration without restarting the container
+- **extra_hosts**: Enables Prometheus to reach the host machine using `host.docker.internal`
 
 Prometheus requires a configuration file to define which services to scrape for metrics. Create the configuration file:
 
@@ -167,15 +243,13 @@ scrape_configs:
   - job_name: 'nodeexporter'
     scrape_interval: 10s
     static_configs:
-      - targets: ['hostip:9100']
-    metric_relabel_configs:
-      - source_labels: [nodename]
-        target_label: "instance"
-        action: "replace"
+      - targets: ['host.docker.internal:9100']
 ```
 
-!!! tip ""
-    Since Node Exporter is using the host network, you need to replace `hostip` with your actual host IP address. The `metric_relabel_configs` will help in relabeling the `hostip:9100` to the actual hostname, making it easier to identify.
+**Configuration explained:**
+
+- **cadvisor:8080**: Connects to cAdvisor container via Docker's backend network
+- **host.docker.internal:9100**: Allows the Prometheus container to reach Node Exporter running on the host system. The `extra_hosts` configuration in the Prometheus docker-compose.yml makes this possible.
 
 Now that you have configured Prometheus, you can start it with the following command:
 

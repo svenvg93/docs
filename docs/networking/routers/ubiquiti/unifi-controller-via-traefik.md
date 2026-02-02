@@ -13,10 +13,16 @@ tags:
 
 While Traefik excels at auto-discovering Docker containers through labels, some services like the Unifi Controller require a different approach. The Unifi Controller uses self-signed certificates and runs on HTTPS, making it a perfect candidate for Traefik's file-based configuration with `insecureSkipVerify`.
 
-## Prerequisites
+## Key Components
 
-- Traefik installed and configured (see my [Traefik Essentials Setup] post)
-- Unifi Controller running and accessible on your network
+1. Traefik - Reverse proxy that handles SSL termination and routes traffic to the Unifi Controller.
+2. Unifi Controller - Network management software running with self-signed HTTPS certificates.
+3. File Provider - Traefik's dynamic configuration system for non-Docker services.
+4. Let's Encrypt - Provides valid SSL certificates for external access without browser warnings.
+
+!!! info "Prerequisites"
+    - Traefik installed and configured (see the [Traefik Setup & Configuration][traefik-setup] guide)
+    - Unifi Controller running and accessible on your network
 
 ## Traefik Configuration
 
@@ -40,7 +46,11 @@ volumes:
   - ./config:/etc/traefik/dynamic:ro
 ```
 
-The `--providers.file.directory` tells Traefik where to find dynamic configuration files, and `--providers.file.watch=true` enables automatic reloading when files change. The `./config` directory will hold our dynamic configuration files.
+**Configuration explained:**
+
+- **providers.file.directory**: Tells Traefik where to find dynamic configuration files for non-Docker services
+- **providers.file.watch**: Enables automatic reloading when configuration files change (no container restart needed)
+- **./config volume**: Maps the local `config` directory to Traefik's dynamic configuration path in read-only mode
 
 ### Create Dynamic Configuration File
 
@@ -69,20 +79,23 @@ http:
       insecureSkipVerify: true
 ```
 
-### Configuration Breakdown
+**Configuration explained:**
 
 **Router Configuration:**
-- `rule`: The domain that will route to your Unifi Controller (adjust to match your setup)
-- `service`: References the service definition below
-- `entryPoints`: Uses the secure HTTPS entry point
-- `tls.certResolver`: Uses Let's Encrypt for valid SSL certificates
+
+- **rule**: The domain that will route to your Unifi Controller (replace `unifi.lab.example.com` with your domain)
+- **service**: References the service definition below for backend routing
+- **entryPoints**: Uses the `websecure` entry point for HTTPS traffic
+- **tls.certResolver**: Uses Let's Encrypt (`le`) to provide valid SSL certificates to clients
 
 **Service Configuration:**
-- `url`: The IP address and protocol of your Unifi Controller
-- `serversTransport`: References the custom transport configuration
+
+- **url**: The IP address and protocol of your Unifi Controller (replace `192.168.1.1` with your controller's IP)
+- **serversTransport**: References the custom transport configuration that handles SSL verification
 
 **Servers Transport:**
-- `insecureSkipVerify: true`: Required because Unifi uses self-signed certificates internally
+
+- **insecureSkipVerify**: Set to `true` because Unifi Controller uses self-signed certificates internally. This allows Traefik to connect to the backend without SSL verification errors.
 
 ## How It Works
 
@@ -96,4 +109,4 @@ When you navigate to `unifi.lab.example.com`:
 
 This file-based approach gives you full control over services that can't use Docker labels, while still benefiting from Traefik's reverse proxy capabilities and automatic SSL certificate management.
 
-[traefik-essentials-setup]: {{< ref "/posts/2024-05-21-traefik-essentials-setup" >}}
+[traefik-setup]: ../../../infrastructure/reverse-proxy/traefik/install-setup

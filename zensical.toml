@@ -23,22 +23,21 @@ nav = [
     {"Monitoring" = [
       "infrastructure/monitoring/host-container-monitoring.md",
       "infrastructure/monitoring/system-logs-loki.md",
-      "infrastructure/monitoring/tailscale-client-metics.md",
+      "infrastructure/monitoring/tailscale-client-metrics.md",
     ]},
-    "infrastructure/managing-portainer-stacks-using-gitops.md",
   ]},
   {"Networking" = [
     "networking/index.md",
     {"Routers" = [
       {"Ubiquiti" = [
-        "networking/routers/ubiquiti/access-unifi-controller-through-traefik.md",
-        "networking/routers/ubiquiti/unifi-syslog-with-alloy-and-loki.md",
+        "networking/routers/ubiquiti/unifi-controller-via-traefik.md",
+        "networking/routers/ubiquiti/unifi-syslog-loki.md",
       ]},
       {"Mikrotik" = [
         "networking/routers/mikrotik/setting-up-an-mikrotik-router.md",
       ]},
       {"GL-Inet" = [
-        "networking/routers/gl-inet/setting-up-your-travel-router-secure-and-reliable-internet-anywhere.md",
+        "networking/routers/gl-inet/travel-router-setup.md",
       ]},
       {"Other" = [
         "networking/routers/other/setting-up-vyos-router-for-your-home-network.md",

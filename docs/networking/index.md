@@ -1,6 +1,7 @@
 ---
 title: Networking
-description: Network configuration, VPNs, tunnels, and connectivity solutions.---
+description: Network configuration, VPNs, tunnels, and connectivity solutions.
+---
 
 # Networking
 

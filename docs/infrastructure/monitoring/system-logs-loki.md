@@ -1,13 +1,23 @@
 ---
 title: System Syslog
-description: In Part 2 of the System Monitoring series, discover how to configure log monitoring for your systems using Loki and Promtail, visualized with Grafana.
+description: In Part 2 of the System Monitoring series, discover how to configure log monitoring for your systems using Loki and Grafana Alloy, visualized with Grafana.
 tags:
 - docker
 - grafana
 - loki
+- alloy
 ---
 
-Monitoring isn’t just about metrics—it’s about ensuring application health. Centralized logging with Loki and Grafana provides deeper insights by visualizing and searching logs, helping you quickly identify and resolve issues.
+Monitoring isn't just about metrics—it's about ensuring application health. Centralized logging with Loki and Grafana provides deeper insights by visualizing and searching logs, helping you quickly identify and resolve issues.
+
+## Key Components
+
+1. Loki - Log aggregation system that stores and indexes logs efficiently for querying and analysis.
+2. Grafana Alloy - Next-generation telemetry collector that ships logs from files to Loki with powerful processing capabilities.
+3. Grafana - Provides visualization and search capabilities for logs stored in Loki.
+
+!!! info "Prerequisites"
+    This guide assumes you have Docker, Docker Compose, and Grafana already installed. If you need to set up Grafana, check out the [Host & Container Monitoring guide][grafana-setup].
 
 ## Setup Loki
 
@@ -103,79 +113,151 @@ ruler:
   alertmanager_url: http://localhost:9093
 ```
 
-## Setup Promtail
+**Configuration explained:**
 
-To finalize your logging setup with Loki, you’ll need to configure Promtail to send logs to Loki.
+- **auth_enabled**: Disabled for simplified single-user deployments (enable for multi-tenant setups)
+- **server**: Configures HTTP (3100) and gRPC (9095) ports for receiving logs and queries
+- **storage.filesystem**: Stores log chunks and rules locally on the filesystem
+- **retention_period**: Keeps logs for 365 days before deletion
+- **ingestion_rate_mb/ingestion_burst_size_mb**: Limits log ingestion rate to prevent overwhelming the system (4MB/s sustained, 6MB/s burst)
+- **max_line_size**: Maximum size of a single log line (256KB)
+- **reject_old_samples_max_age**: Rejects logs older than 168 hours (7 days) to maintain data consistency
 
-Start by creating a folder to store the `docker-compose.yml` and `promtail-config.yaml` files.
+## Setup Grafana Alloy
+
+To finalize your logging setup with Loki, you'll need to configure Grafana Alloy to collect and ship logs to Loki.
+
+??? question "Why Grafana Alloy?"
+
+    Grafana Alloy is the next-generation telemetry collector that replaces Promtail. It supports multiple data formats including logs, metrics, traces, and profiles. For file-based log collection, Alloy provides:
+
+    - More efficient log processing and transformation
+    - Native support for multiple output destinations
+    - Lower resource usage compared to Promtail
+    - Unified configuration for all telemetry types
+    - Active development and long-term support
+
+Start by creating a folder to store the `docker-compose.yml` and Alloy configuration files:
 
 ```bash
-mkdir promtail
+mkdir alloy
 ```
 
-Open a new `docker-compose.yml` file for editing:
+Create the Docker Compose file:
 
 ```bash
-nano promtail/docker-compose.yml
+nano alloy/docker-compose.yml
 ```
-Paste the following content into the file:
+
+Paste the following content:
+
 ```yaml title="docker-compose.yml"
 services:
-  promtail:
-    image: grafana/promtail
-    container_name: promtail
+  alloy:
+    image: grafana/alloy:latest
+    container_name: alloy
     restart: unless-stopped
     environment:
       - TZ=Europe/Amsterdam
+    ports:
+      - "12345:12345"
     volumes:
-      - ./promtail-config.yaml:/etc/promtail/promtail-config.yaml:ro
-      - /var/log/:/logs
-    command: -config.file=/etc/promtail/promtail-config.yaml
+      - ./config.alloy:/etc/alloy/config.alloy:ro
+      - /var/log:/var/log:ro
+      - alloy-data:/var/lib/alloy/data
+    command:
+      - run
+      - --server.http.listen-addr=0.0.0.0:12345
+      - --storage.path=/var/lib/alloy/data
+      - /etc/alloy/config.alloy
     networks:
       - backend
+
 networks:
   backend:
     name: backend
+
+volumes:
+  alloy-data:
+    name: alloy-data
 ```
 
-Now, create a configuration file named `promtail-config.yaml`:
+Now, create the Alloy configuration file:
 
-```yaml title="promtail-config.yml"
-server:
-  http_listen_port: 9080
-  grpc_listen_port: 0
-positions:
-  filename: /tmp/positions.yaml
-clients:
-  - url: http://loki:3100/loki/api/v1/push
-
-scrape_configs:
-- job_name: authlog
-  static_configs:
-  - targets:
-      - authlog
-    labels:
-      job: authlog
-      __path__: /logs/auth.log
-
-- job_name: syslog
-  static_configs:
-  - targets:
-      - syslog
-    labels:
-      job: syslog
-      __path__: /logs/syslog
+```bash
+nano alloy/config.alloy
 ```
 
-This configuration will scrape the system’s auth and syslog logs.
+Paste the following configuration:
 
-Note: You can customize the job_name, `targets`, `job`, and `__path__` under scrape_configs according to your logging requirements.
+```hcl title="config.alloy"
+// System auth.log collection
+local.file_match "authlog" {
+  path_targets = [{
+    __path__ = "/var/log/auth.log",
+  }]
+}
 
-Finally, start the Loki and Promtail services by running the following commands:
+loki.source.file "authlog" {
+  targets    = local.file_match.authlog.targets
+  forward_to = [loki.process.authlog.receiver]
+}
+
+loki.process "authlog" {
+  stage.static_labels {
+    values = {
+      job = "authlog",
+    }
+  }
+
+  forward_to = [loki.write.default.receiver]
+}
+
+// System syslog collection
+local.file_match "syslog" {
+  path_targets = [{
+    __path__ = "/var/log/syslog",
+  }]
+}
+
+loki.source.file "syslog" {
+  targets    = local.file_match.syslog.targets
+  forward_to = [loki.process.syslog.receiver]
+}
+
+loki.process "syslog" {
+  stage.static_labels {
+    values = {
+      job = "syslog",
+    }
+  }
+
+  forward_to = [loki.write.default.receiver]
+}
+
+// Loki write endpoint
+loki.write "default" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}
+```
+
+**Configuration explained:**
+
+- **local.file_match**: Defines which log files to monitor (supports wildcards like `/var/log/*.log`)
+- **loki.source.file**: Creates a file reader that tails log files and tracks reading positions
+- **loki.process**: Processes logs and adds labels for organization in Grafana
+- **stage.static_labels**: Adds custom labels to identify the log source (like `job: "syslog"`)
+- **loki.write**: Defines the Loki endpoint where processed logs are sent
+
+You can customize the file paths and labels according to your logging requirements. Alloy supports wildcards and multiple file sources.
+
+Finally, start the Loki and Alloy services by running the following commands:
 
 ```bash
 docker compose -f loki/docker-compose.yml up -d
-docker compose -f promtail/docker-compose.yml up -d
+docker compose -f alloy/docker-compose.yml up -d
 ```
 
 ## Grafana
@@ -199,4 +281,8 @@ Now that you have added Loki as a datasource, you can explore your logs:
 
 ## Summary
 
-With Loki configured as a datasource in Grafana, Promtail will continuously send log files to Loki, allowing you to visualize and analyze logs easily. This setup provides a comprehensive monitoring solution, enabling you to monitor both metrics and logs from your applications.
+With Loki configured as a datasource in Grafana, Alloy will continuously collect and send log files to Loki, allowing you to visualize and analyze logs easily. This setup provides a comprehensive monitoring solution, enabling you to monitor both metrics and logs from your applications.
+
+Grafana Alloy's modern architecture provides better performance and more flexible log processing compared to Promtail, while integrating seamlessly with the Grafana ecosystem.
+
+[grafana-setup]: ./host-container-monitoring

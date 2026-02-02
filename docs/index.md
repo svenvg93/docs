@@ -62,7 +62,7 @@ If you're new to self-hosting, we recommend starting with:
 [networking]: infrastructure/networking/index.md
 [routers]: infrastructure/routers/index.md
 [system-monitoring]: monitoring/host-container-monitoring-with-prometheus.md
-[log-management]: monitoring/log-monitoring-with-loki-promtail.md
+[log-management]: infrastructure/monitoring/system-logs-loki.md
 [network-monitoring]: infrastructure/networking/monitoring-tailscale-clients-with-prometheus.md
 [authentication]: security/selfhost-a-single-sign-on-mfa-with-authentik.md
 [zero-trust-access]: security/secure-your-cloudflare-tunnel-with-authentik.md
