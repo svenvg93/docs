@@ -24,11 +24,11 @@ To configure the MikroTik router, you’ll first need to establish a connection.
 1. Connect the serial cable to the MikroTik router and your computer.
 2. Use terminal software like PuTTY (Windows), screen (Linux), or Serial (macOS).
 3. Configure the terminal software with the following settings:
-  - **Baud Rate** : 115200
-  - **Data Bits** : 8
-  - **Stop Bits** : 1
-  - **Parity** : None
-  - **Flow Control** : None
+    - **Baud Rate** : 115200
+    - **Data Bits** : 8
+    - **Stop Bits** : 1
+    - **Parity** : None
+    - **Flow Control** : None
 4. Open the connection, and you’ll see the MikroTik console.
 5. When prompted, enter the default username `admin` and leave the password field blank (default).
 
@@ -39,6 +39,10 @@ To configure the MikroTik router, you’ll first need to establish a connection.
 4. When prompted, enter the default username `admin` and leave the password field blank (default).
 
 First, we’ll configure the LAN ports to establish a network connection for all your devices. This will ensure that both your homelab and internet access are set up properly, providing seamless connectivity throughout your network.
+
+
+!!! tip ""
+    Replace the placeholder variables on the highlighted lines with values that match your environment.
 
 ## LAN
 
@@ -114,43 +118,46 @@ set sip disabled=yes
 
 We’ll need to configure the WAN interface to obtain an IP address from your ISP. In this setup, the physical interface `ether1` will be used to connect to your ISP. 
 
-Be sure to replace the placeholder variables [inside brackets] with values specific to your setup.
+=== "DHCP with VLAN"
+    ```bash hl_lines="1"
+    /interface vlan add interface=ether1 name=internet vlan-id=[ISP VLAN ID]
+    /ip dhcp-client add interface=internet disabled=no use-peer-ntp=no add-default-route=yes 
+    /interface list add name=WAN 
+    /interface list member add interface=internet list=WAN
+    ```
 
-```bash title="DHCP with VLAN"
-/interface vlan add interface=ether1 name=internet vlan-id=[ISP VLAN ID]
-/ip dhcp-client add interface=internet disabled=no use-peer-ntp=no add-default-route=yes 
-/interface list add name=WAN 
-/interface list member add interface=internet list=WAN
-```
+=== "DHCP"
+    ```bash
+    /interface ethernet set ether1 name=internet 
+    /ip dhcp-client add interface=internet add-default-route=yes disabled=no use-peer-ntp=no 
+    /interface list add name=WAN 
+    /interface list member add interface=internet list=WAN`
+    ```
 
-```bash title="DHCP"
-/interface ethernet set ether1 name=internet 
-/ip dhcp-client add interface=internet add-default-route=yes disabled=no use-peer-ntp=no 
-/interface list add name=WAN 
-/interface list member add interface=internet list=WAN`
-```
+=== "PPPoE with VLAN"
+    ```bash hl_lines="2"
+    /interface add interface=ether1 name=vlan_int vlan-id=[ISP VLAN ID]
+    /interface pppoe-client add add-default-route=yes disabled=no interface=vlan_int name=internet use-peer-dns=yes user=[username] password=[password] 
+    /interface list add name=WAN 
+    /interface list member add interface=internet list=WAN`
+    ```
 
-```bash title="PPPoE with VLAN"
-/interface add interface=ether1 name=vlan_int vlan-id=[ISP VLAN ID]
-/interface pppoe-client add add-default-route=yes disabled=no interface=vlan_int name=internet use-peer-dns=yes user=[username] password=[password]
-/interface list add name=WAN 
-/interface list member add interface=internet list=WAN`
-```
+=== "PPPoE"
+    ```bash hl_lines="1"
+    /interface pppoe-client add add-default-route=yes disabled=no interface=ether1 name=internet use-peer-dns=yes user=[username] password=[password]
+    /interface list add name=WAN 
+    /interface list member add interface=internet list=WAN`
+    ```
 
-```bash title="PPPoE"
-/interface pppoe-client add add-default-route=yes disabled=no interface=ether1 name=internet use-peer-dns=yes user=[username] password=[password]
-/interface list add name=WAN 
-/interface list member add interface=internet list=WAN`
-```
-
-```bash title="Static IP"
-/interface ethernet set ether1 name=internet 
-/ip address add address=[IP Address] interface=internet 
-/ip route add gateway=[IP Gateway]
-/ip dns set servers=[DNS Server]
-/interface list add name=WAN 
-/interface list member add interface=internet list=WAN`
-```
+=== "Static IP"
+    ```bash hl_lines="2 3 4"
+    /interface ethernet set ether1 name=internet 
+    /ip address add address=[IP Address] interface=internet
+    /ip route add gateway=[IP Gateway]
+    /ip dns set servers=[DNS Server]
+    /interface list add name=WAN 
+    /interface list member add interface=internet list=WAN`
+    ```
 
 
 ## NAT
@@ -168,33 +175,29 @@ We’ll create a new user account with the necessary privileges and then disable
 
 ### User Account
 
-```bash
+```bash hl_lines="1"
 /user add name=[YourUsername] password=[YourPassword] group=full
 /user disable admin
 ```
 
-* Replace [YourUsername] to your new username
-* Replace [YourPassword] to your new password
-
 ### Hostname
 
-```bash
+```bash hl_lines="2"
 /system identity
-set name=<Your hostname>
+set name=[Your hostname]
 ```
 
 ### NTP
 
 To ensure the router displays the accurate time, we’ll configure the correct timezone.
 
-```bash
+```bash hl_lines="6"
 /system ntp client
 set enabled=yes
 /system ntp client servers
 add address=time.cloudflare.com
 /system clock
-set time-zone-name=Your Timezone
+set time-zone-name=[Your Timezone]
 ```
-Replace `Your Timezone` this to your timezone
 
-Now your MikroTik router is fully configured and ready to power your homelab! 🎉 With a secure and efficient network in place, you can focus on building and exploring your homelab projects. Happy networking! 🤝
+Now your MikroTik router is fully configured and ready to power your homelab! With a secure and efficient network in place, you can focus on building and exploring your homelab projects. Happy networking!
