@@ -21,180 +21,33 @@ Monitoring isn't just about metrics—it's about ensuring application health. Ce
 
 ## Setup Loki
 
-To set up Loki, we need to create a folder to hold both the `docker-compose.yml` and the configuration file.
+Loki is required to store and query the logs collected by Alloy.
 
-First, create the folder for Loki:
-```bash
-mkdir loki
-```
-
-Open a new `docker-compose.yml` file for editing:
-
-```bash
-nano loki/docker-compose.yml
-```
-Paste the following content into the file:
-```yaml title="docker-compose.yml"
-services:
-  loki:
-    image: grafana/loki
-    container_name: loki
-    restart: unless-stopped
-    environment:
-      - TZ=Europe/Amsterdam
-    expose:
-      - 3100
-    volumes:
-      - ./loki-config.yaml:/etc/loki/loki-config.yaml:ro
-      - loki:/tmp
-    command: -config.file=/etc/loki/loki-config.yaml
-    networks:
-      - backend
-
-networks:
-  backend:
-    name: backend
-
-volumes:
-    loki:
-      name: loki
-```
-
-Loki requires a configuration file to define which services to scrape for metrics. Create the configuration file:
-```bash
-nano loki/loki-config.yaml
-```
-Paste the following content into the file:
-```yaml title="loki-config.yml"
----
-auth_enabled: false
-
-server:
-  http_listen_address: 0.0.0.0
-  http_listen_port: 3100
-  grpc_listen_port: 9095
-  log_level: info
-
-common:
-  instance_addr: 127.0.0.1
-  path_prefix: /loki
-  storage:
-    filesystem:
-      chunks_directory: /loki/chunks
-      rules_directory: /loki/rules
-  replication_factor: 1
-  ring:
-    kvstore:
-      store: memberlist
-
-schema_config:
-  configs:
-    - from: 2020-10-24
-      store: tsdb
-      object_store: filesystem
-      schema: v13
-      index:
-        prefix: index_
-        period: 24h
-
-limits_config:
-  query_timeout: 600s
-  retention_period: "365d"
-  ingestion_rate_mb: 4
-  ingestion_burst_size_mb: 6
-  max_streams_per_user: 10000
-  max_line_size: 256000
-  reject_old_samples: true
-  reject_old_samples_max_age: 168h
-  creation_grace_period: 15m
-  discover_log_levels: false
-
-ruler:
-  alertmanager_url: http://localhost:9093
-```
-
-**Configuration explained:**
-
-- **auth_enabled**: Disabled for simplified single-user deployments (enable for multi-tenant setups)
-- **server**: Configures HTTP (3100) and gRPC (9095) ports for receiving logs and queries
-- **storage.filesystem**: Stores log chunks and rules locally on the filesystem
-- **retention_period**: Keeps logs for 365 days before deletion
-- **ingestion_rate_mb/ingestion_burst_size_mb**: Limits log ingestion rate to prevent overwhelming the system (4MB/s sustained, 6MB/s burst)
-- **max_line_size**: Maximum size of a single log line (256KB)
-- **reject_old_samples_max_age**: Rejects logs older than 168 hours (7 days) to maintain data consistency
+!!! info "Loki Installation"
+    If you haven't installed Loki yet, follow the [Install Loki](../applications/install-loki.md) guide first.
 
 ## Setup Grafana Alloy
 
-To finalize your logging setup with Loki, you'll need to configure Grafana Alloy to collect and ship logs to Loki.
+To ship logs to Loki, you need Grafana Alloy installed and configured with the Loki endpoint.
 
-??? question "Why Grafana Alloy?"
+!!! info "Alloy Installation"
+    If you haven't installed Alloy yet, follow the [Install Alloy](../applications/install-alloy.md) guide first. Make sure your `endpoint.alloy` includes the Loki endpoint configuration.
 
-    Grafana Alloy is the next-generation telemetry collector that replaces Promtail. It supports multiple data formats including logs, metrics, traces, and profiles. For file-based log collection, Alloy provides:
+### Add System Logs Configuration
 
-    - More efficient log processing and transformation
-    - Native support for multiple output destinations
-    - Lower resource usage compared to Promtail
-    - Unified configuration for all telemetry types
-    - Active development and long-term support
-
-Start by creating a folder to store the `docker-compose.yml` and Alloy configuration files:
+Create a new config file for system log collection:
 
 ```bash
-mkdir alloy
-```
-
-Create the Docker Compose file:
-
-```bash
-nano alloy/docker-compose.yml
-```
-
-Paste the following content:
-
-```yaml title="docker-compose.yml"
-services:
-  alloy:
-    image: grafana/alloy:latest
-    container_name: alloy
-    restart: unless-stopped
-    environment:
-      - TZ=Europe/Amsterdam
-    ports:
-      - "12345:12345"
-    volumes:
-      - ./config.alloy:/etc/alloy/config.alloy:ro
-      - /var/log:/var/log:ro
-      - alloy-data:/var/lib/alloy/data
-    command:
-      - run
-      - --server.http.listen-addr=0.0.0.0:12345
-      - --storage.path=/var/lib/alloy/data
-      - /etc/alloy/config.alloy
-    networks:
-      - backend
-
-networks:
-  backend:
-    name: backend
-
-volumes:
-  alloy-data:
-    name: alloy-data
-```
-
-Now, create the Alloy configuration file:
-
-```bash
-nano alloy/config.alloy
+nano alloy/config/syslog.alloy
 ```
 
 Paste the following configuration:
 
-```hcl title="config.alloy"
+```hcl title="syslog.alloy"
 // System auth.log collection
 local.file_match "authlog" {
   path_targets = [{
-    __path__ = "/var/log/auth.log",
+    __path__ = "/var/log/auth.log", // (1)!
   }]
 }
 
@@ -206,11 +59,11 @@ loki.source.file "authlog" {
 loki.process "authlog" {
   stage.static_labels {
     values = {
-      job = "authlog",
+      job = "authlog", // (2)!
     }
   }
 
-  forward_to = [loki.write.default.receiver]
+  forward_to = [loki.write.default.receiver] // (3)!
 }
 
 // System syslog collection
@@ -234,14 +87,11 @@ loki.process "syslog" {
 
   forward_to = [loki.write.default.receiver]
 }
-
-// Loki write endpoint
-loki.write "default" {
-  endpoint {
-    url = "http://loki:3100/loki/api/v1/push"
-  }
-}
 ```
+
+1. :material-file-search: **Log Path** - Adjust to match your log file locations. Supports wildcards like `/var/log/*.log`
+2. :material-tag: **Job Label** - Custom label to identify this log source in Grafana
+3. :material-arrow-right: **Forward To** - References the Loki endpoint defined in `endpoint.alloy`
 
 **Configuration explained:**
 
@@ -249,27 +99,19 @@ loki.write "default" {
 - **loki.source.file**: Creates a file reader that tails log files and tracks reading positions
 - **loki.process**: Processes logs and adds labels for organization in Grafana
 - **stage.static_labels**: Adds custom labels to identify the log source (like `job: "syslog"`)
-- **loki.write**: Defines the Loki endpoint where processed logs are sent
 
-You can customize the file paths and labels according to your logging requirements. Alloy supports wildcards and multiple file sources.
+### Start Services
 
-Finally, start the Loki and Alloy services by running the following commands:
+Restart Alloy to pick up the new configuration:
 
 ```bash
-docker compose -f loki/docker-compose.yml up -d
-docker compose -f alloy/docker-compose.yml up -d
+docker restart alloy
 ```
 
 ## Grafana
 
-To visualize logs from Loki in Grafana, you need to configure Loki as a datasource. Here’s how to do it:
-
-1.	Open Grafana:
-2.  Click **Connections** in the left-side menu.
-3.  Search for **Loki**
-4.  Click **Add new Datasource**
-5.  Enter the name **loki**
-6.  Fill in the Prometheus server URL `http://loki:3100`
+!!! info "Loki Datasource"
+    Make sure you have added Loki as a datasource in Grafana. See the [Install Loki](../applications/install-loki.md#grafana-datasource) guide for instructions.
 
 ### Exploring Logs in Grafana
 

@@ -18,7 +18,11 @@ Traefik exposes metrics on EntryPoints, Routers, Services, and more. This guide 
 4. Grafana Alloy - Ships logs from your applications to Loki for efficient storage and querying.
 
 !!! info "Prerequisites"
-    This guide assumes you already have Grafana, Prometheus, Alloy, and Loki set up. See the [Host & Container Monitoring][grafana-prometheus] and [System Logs with Loki][alloy-loki] guides for setup instructions.
+    This guide assumes you already have Grafana, Prometheus, Alloy, and Loki set up. See the following guides:
+
+    - [Install Alloy](../../applications/install-alloy.md) - Telemetry collector setup
+    - [Install Loki](../../applications/install-loki.md) - Log aggregation setup
+    - [Host & Container Monitoring][grafana-prometheus] - Grafana and Prometheus setup
 
 ## Metrics
 
@@ -94,9 +98,11 @@ command:
   - "--accesslog.format=json"
   - "--accesslog.fields.defaultmode=keep"
   - "--accesslog.fields.names.StartUTC=drop"
-  - "--log.filepath=/log/traefik.log"
+  - "--log.filepath=/log/traefik.log" # (1)!
   - "--log.format=json"
 ```
+
+1. :material-alert-circle: **File only** - Setting a filepath redirects logs to the file. They will no longer appear in `docker logs traefik`
 
 2. **Add volume mapping** for log directory:
 
@@ -119,13 +125,17 @@ docker compose -f traefik/docker-compose.yml up -d --force-recreate
 
 ### Grafana Alloy
 
-To enable Alloy to collect Traefik logs, you'll need to add a new file source configuration to your `config.alloy`. Add the following to your existing Alloy configuration:
+Create a new Alloy config file for Traefik log collection:
 
-```hcl title="config.alloy"
+```bash
+nano alloy/config/traefik.alloy
+```
+
+```hcl title="traefik.alloy"
 // Traefik logs collection
 local.file_match "traefik" {
   path_targets = [{
-    __path__ = "/var/log/traefik/*.log",
+    __path__ = "/var/log/traefik/*.log", // (1)!
   }]
 }
 
@@ -137,24 +147,29 @@ loki.source.file "traefik" {
 loki.process "traefik" {
   stage.static_labels {
     values = {
-      job = "traefik",
+      job = "traefik", // (2)!
     }
   }
 
-  forward_to = [loki.write.default.receiver]
+  forward_to = [loki.write.default.receiver] // (3)!
 }
 ```
 
-**Note**: Ensure your Alloy `docker-compose.yml` has the Traefik log directory mounted:
+1. :material-file-search: **Log Path** - Collects all `.log` files from the Traefik log directory
+2. :material-tag: **Job Label** - Identifies these logs as Traefik in Grafana
+3. :material-arrow-right: **Forward To** - References the Loki endpoint defined in `endpoint.alloy`
 
-```yaml title="docker-compose.yml"
-volumes:
-  - ./config.alloy:/etc/alloy/config.alloy:ro
-  - /var/log:/var/log:ro  # This allows access to /var/log/traefik
-  - alloy-data:/var/lib/alloy/data
-```
+!!! note "Volume mount required"
+    Ensure your Alloy `docker-compose.yml` has `/var/log` mounted (which includes `/var/log/traefik`):
 
-After updating the configuration, restart the Alloy service for the changes to take effect:
+    ```yaml
+    volumes:
+      - ./config/:/etc/alloy/config/:ro
+      - /var/log:/var/log:ro  # Provides access to /var/log/traefik
+      - alloy-data:/var/lib/alloy/data
+    ```
+
+Restart Alloy to pick up the new configuration:
 
 ```bash
 docker restart alloy
@@ -173,7 +188,6 @@ You can either create a custom dashboard or use a pre-built one:
 
 Your monitoring setup is now complete. The dashboard provides insights into your Traefik instance's performance and helps identify issues quickly.
 
-[grafana-prometheus]: ../host-container-monitoring
-[alloy-loki]: ../system-logs-loki
+[grafana-prometheus]: ../../monitoring/host-container-monitoring
 [here]: https://doc.traefik.io/traefik/observability/metrics/overview/#global-metrics
 [traefik dashboard]: https://github.com/svenvg93/Grafana-Dashboard/tree/master/traefik

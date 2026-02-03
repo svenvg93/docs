@@ -20,6 +20,10 @@ nav = [
         "infrastructure/reverse-proxy/traefik/wildcard-ssl-certificates.md",
       ]},
     ]},
+    {"Observability" = [
+      "infrastructure/observability/install-alloy.md",
+      "infrastructure/observability/install-loki.md",
+    ]},
     {"Monitoring" = [
       "infrastructure/monitoring/host-container-monitoring.md",
       "infrastructure/monitoring/system-logs-loki.md",
