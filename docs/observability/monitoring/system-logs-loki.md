@@ -1,5 +1,5 @@
 ---
-title: System Syslog
+title: System Logs
 description: In Part 2 of the System Monitoring series, discover how to configure log monitoring for your systems using Loki and Grafana Alloy, visualized with Grafana.
 tags:
 - docker
@@ -24,14 +24,14 @@ Monitoring isn't just about metrics—it's about ensuring application health. Ce
 Loki is required to store and query the logs collected by Alloy.
 
 !!! info "Loki Installation"
-    If you haven't installed Loki yet, follow the [Install Loki](../applications/install-loki.md) guide first.
+    If you haven't installed Loki yet, follow the [Install Loki](../tools/install-loki.md) guide first.
 
 ## Setup Grafana Alloy
 
 To ship logs to Loki, you need Grafana Alloy installed and configured with the Loki endpoint.
 
 !!! info "Alloy Installation"
-    If you haven't installed Alloy yet, follow the [Install Alloy](../applications/install-alloy.md) guide first. Make sure your `endpoint.alloy` includes the Loki endpoint configuration.
+    If you haven't installed Alloy yet, follow the [Install Alloy](../tools/install-alloy.md) guide first. Make sure your `endpoint.alloy` includes the Loki endpoint configuration.
 
 ### Add System Logs Configuration
 
@@ -93,6 +93,14 @@ loki.process "syslog" {
 2. :material-tag: **Job Label** - Custom label to identify this log source in Grafana
 3. :material-arrow-right: **Forward To** - References the Loki endpoint defined in `endpoint.alloy`
 
+!!! note "Log folder access"
+    Alloy needs access to the host's log directory. Add the following volume mount to your Alloy `docker-compose.yml`:
+
+    ```yaml
+    volumes:
+      - /var/log:/var/log:ro
+    ```
+
 **Configuration explained:**
 
 - **local.file_match**: Defines which log files to monitor (supports wildcards like `/var/log/*.log`)
@@ -111,7 +119,7 @@ docker restart alloy
 ## Grafana
 
 !!! info "Loki Datasource"
-    Make sure you have added Loki as a datasource in Grafana. See the [Install Loki](../applications/install-loki.md#grafana-datasource) guide for instructions.
+    Make sure you have added Loki as a datasource in Grafana. See the [Install Loki](../tools/install-loki.md#grafana-datasource) guide for instructions.
 
 ### Exploring Logs in Grafana
 

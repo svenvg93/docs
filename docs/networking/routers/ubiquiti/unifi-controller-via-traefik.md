@@ -109,4 +109,4 @@ When you navigate to `unifi.lab.example.com`:
 
 This file-based approach gives you full control over services that can't use Docker labels, while still benefiting from Traefik's reverse proxy capabilities and automatic SSL certificate management.
 
-[traefik-setup]: ../../../infrastructure/reverse-proxy/traefik/install-setup
+[traefik-setup]: ../../reverse-proxy/traefik/install-setup

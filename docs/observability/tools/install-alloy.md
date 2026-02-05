@@ -62,15 +62,14 @@ services:
       - "12345:12345" # (3)!
     volumes:
       - ./config/:/etc/alloy/config/:ro
-      - /var/log:/var/log:ro # (4)!
       - alloy-data:/var/lib/alloy/data
     command:
       - run
       - --server.http.listen-addr=0.0.0.0:12345
       - --storage.path=/var/lib/alloy/data
-      - /etc/alloy/config/ # (5)!
+      - /etc/alloy/config/ # (4)!
     networks:
-      - backend # (6)!
+      - backend # (5)!
 
 networks:
   backend:
@@ -84,9 +83,8 @@ volumes:
 1. :material-server: **Hostname** - Inherits the host system's hostname so logs are tagged with the correct source
 2. :material-clock-outline: **Timezone** - Change to your local timezone (e.g., `America/New_York`, `UTC`)
 3. :material-web: **Web UI Port** - Alloy's web interface for debugging and monitoring
-4. :material-file-document-outline: **Log Directory** - Mount additional directories if your logs are elsewhere
-5. :material-folder-cog: **Config Directory** - Alloy loads all `.alloy` files from this directory
-6. :material-lan: **Network** - Ensure this matches the network where Loki is running
+4. :material-folder-cog: **Config Directory** - Alloy loads all `.alloy` files from this directory
+5. :material-lan: **Network** - Ensure this matches the network where Loki is running
 
 ## Configuration Files
 

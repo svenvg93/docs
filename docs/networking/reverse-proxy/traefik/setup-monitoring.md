@@ -20,9 +20,10 @@ Traefik exposes metrics on EntryPoints, Routers, Services, and more. This guide 
 !!! info "Prerequisites"
     This guide assumes you already have Grafana, Prometheus, Alloy, and Loki set up. See the following guides:
 
-    - [Install Alloy](../../applications/install-alloy.md) - Telemetry collector setup
-    - [Install Loki](../../applications/install-loki.md) - Log aggregation setup
-    - [Host & Container Monitoring][grafana-prometheus] - Grafana and Prometheus setup
+    - [Install Alloy](../../../observability/tools/install-alloy.md) - Telemetry collector setup
+    - [Install Loki](../../../observability/tools/install-loki.md) - Log aggregation setup
+    - [Install Prometheus](../../../observability/tools/install-prometheus.md) - Metrics storage
+    - [Install Grafana](../../../observability/tools/install-grafana.md) - Visualization
 
 ## Metrics
 
@@ -188,6 +189,6 @@ You can either create a custom dashboard or use a pre-built one:
 
 Your monitoring setup is now complete. The dashboard provides insights into your Traefik instance's performance and helps identify issues quickly.
 
-[grafana-prometheus]: ../../monitoring/host-container-monitoring
+[grafana-prometheus]: ../../../observability/monitoring/host-container-monitoring
 [here]: https://doc.traefik.io/traefik/observability/metrics/overview/#global-metrics
 [traefik dashboard]: https://github.com/svenvg93/Grafana-Dashboard/tree/master/traefik

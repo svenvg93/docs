@@ -53,14 +53,12 @@ services:
     restart: unless-stopped
     environment:
       - TZ=Europe/Amsterdam # (1)!
-    expose:
-      - 3100 # (2)!
     volumes:
       - ./loki-config.yaml:/etc/loki/loki-config.yaml:ro
-      - loki-data:/loki # (3)!
+      - loki-data:/loki # (2)!
     command: -config.file=/etc/loki/loki-config.yaml
     networks:
-      - backend # (4)!
+      - backend # (3)!
 
 networks:
   backend:
@@ -72,9 +70,8 @@ volumes:
 ```
 
 1. :material-clock-outline: **Timezone** - Change to your local timezone (e.g., `America/New_York`, `UTC`)
-2. :material-network: **Port** - Exposes port 3100 internally on the Docker network (use `ports` to expose externally)
-3. :material-database: **Data Volume** - Persistent storage for log chunks and indexes
-4. :material-lan: **Network** - Ensure this matches the network where Alloy and Grafana are running
+2. :material-database: **Data Volume** - Persistent storage for log chunks and indexes
+3. :material-lan: **Network** - Ensure this matches the network where Alloy and Grafana are running
 
 ## Configuration
 

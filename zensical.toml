@@ -11,23 +11,19 @@ copyright = "Copyright &copy; 2024-2026 Sven van Ginkel"
 
 nav = [
   {"Home" = "index.md"},
-  {"Infrastructure" = [
-    "infrastructure/index.md",
-    {"Reverse Proxy" = [
-      {"Traefik" = [
-        "infrastructure/reverse-proxy/traefik/install-setup.md",
-        "infrastructure/reverse-proxy/traefik/setup-monitoring.md",
-        "infrastructure/reverse-proxy/traefik/wildcard-ssl-certificates.md",
-      ]},
-    ]},
-    {"Observability" = [
-      "infrastructure/observability/install-alloy.md",
-      "infrastructure/observability/install-loki.md",
+  {"Observability" = [
+    "observability/index.md",
+    {"Tools" = [
+      "observability/tools/install-alloy.md",
+      "observability/tools/install-grafana.md",
+      "observability/tools/install-loki.md",
+      "observability/tools/install-prometheus.md",
     ]},
     {"Monitoring" = [
-      "infrastructure/monitoring/host-container-monitoring.md",
-      "infrastructure/monitoring/system-logs-loki.md",
-      "infrastructure/monitoring/tailscale-client-metrics.md",
+      "observability/monitoring/host-container-monitoring.md",
+      "observability/monitoring/docker-logs-loki.md",
+      "observability/monitoring/system-logs-loki.md",
+      "observability/monitoring/tailscale-client-metrics.md",
     ]},
   ]},
   {"Networking" = [
@@ -38,13 +34,20 @@ nav = [
         "networking/routers/ubiquiti/unifi-syslog-loki.md",
       ]},
       {"Mikrotik" = [
-        "networking/routers/mikrotik/setting-up-an-mikrotik-router.md",
+        "networking/routers/mikrotik/install-setup.md",
       ]},
       {"GL-Inet" = [
         "networking/routers/gl-inet/travel-router-setup.md",
       ]},
-      {"Other" = [
-        "networking/routers/other/setting-up-vyos-router-for-your-home-network.md",
+      {"VyOS" = [
+        "networking/routers/vyos/install-setup.md",
+      ]},
+    ]},
+    {"Reverse Proxy" = [
+      {"Traefik" = [
+        "networking/reverse-proxy/traefik/install-setup.md",
+        "networking/reverse-proxy/traefik/setup-monitoring.md",
+        "networking/reverse-proxy/traefik/wildcard-ssl-certificates.md",
       ]},
     ]},
     {"VPN & Tunnels" = [
