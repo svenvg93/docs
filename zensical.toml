@@ -6,6 +6,7 @@ site_name = "Tech Documentation"
 site_description = "Comprehensive guides for self-hosting, infrastructure, automation, and monitoring."
 site_author = "Sven van Ginkel"
 # site_url = "https://your-domain.com/"
+extra_css = ["stylesheets/extra.css"]
 
 copyright = "Copyright &copy; 2024-2026 Sven van Ginkel"
 
@@ -51,11 +52,10 @@ nav = [
       ]},
     ]},
     {"VPN & Tunnels" = [
-      "networking/configure-split-dns-with-tailscale-and-local-dns.md",
       "networking/self-hosting-securely-with-cloudflare-tunnels.md",
     ]},
     {"Other" = [
-      "networking/remote-packet-capture-with-wireshark.md",
+      "networking/remote-packet-capture.md",
     ]},
   ]},
   {"Automation" = [
@@ -104,9 +104,10 @@ language = "en"
 
 features = [
   "announce.dismiss",
+  "content.action.edit",
+  "content.action.view",
   "content.code.annotate",
   "content.code.copy",
-  "content.code.select",
   "content.footnote.tooltips",
   "content.tabs.link",
   "content.tooltips",
@@ -116,11 +117,12 @@ features = [
   "navigation.instant.prefetch",
   "navigation.path",
   "navigation.sections",
-  "navigation.top",
-  "navigation.tracking",
   "navigation.tabs",
   "navigation.tabs.sticky",
+  "navigation.top",
+  "navigation.tracking",
   "search.highlight",
+  "toc.follow"
 ]
 
 # Color Schemes

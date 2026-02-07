@@ -21,7 +21,7 @@ Whether you're a digital nomad, a frequent traveler, or just someone who values 
 3. VPN Support - Built-in support for WireGuard and OpenVPN for encrypted connections.
 4. Wi-Fi 6 (802.11ax) - Latest wireless standard offering improved speed and efficiency.
 
-!!! info "Prerequisites"
+??? info "Prerequisites"
     - GL.iNet Beryl AX router or similar GL.iNet device running OpenWRT
     - Access to hotel/public Wi-Fi or Ethernet connection
     - Basic understanding of networking concepts

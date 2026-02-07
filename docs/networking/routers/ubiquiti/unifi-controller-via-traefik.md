@@ -20,7 +20,7 @@ While Traefik excels at auto-discovering Docker containers through labels, some 
 3. File Provider - Traefik's dynamic configuration system for non-Docker services.
 4. Let's Encrypt - Provides valid SSL certificates for external access without browser warnings.
 
-!!! info "Prerequisites"
+??? info "Prerequisites"
     - Traefik installed and configured (see the [Traefik Setup & Configuration][traefik-setup] guide)
     - Unifi Controller running and accessible on your network
 

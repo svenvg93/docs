@@ -35,6 +35,9 @@ Enter configuration mode to begin the initial setup:
 configure
 ```
 
+!!! info "commit and save"
+    Throughout this guide you'll see `commit; save` after each configuration block. The `commit` command applies changes to the running configuration, while `save` writes them to disk. If you only `commit` without `save`, your changes will be lost on reboot.
+
 ## LAN
 
 Configure the LAN ports to establish a network connection for all your devices. This will ensure that both your homelab and internet access are set up properly, providing seamless connectivity throughout your network.
@@ -52,7 +55,7 @@ set interfaces bridge br0 member interface eth0
 commit; save
 ```
 
-Repeat the `interfaces bridge br0 member interface eth0` command for every interface you want to be part of the bridge.
+Repeat the `member interface` command for every interface you want to be part of the bridge, replacing `eth0` with the appropriate interface name (e.g., `eth2`, `eth3`).
 
 You can check the bridge with the command `run show bridge br0`
 
@@ -202,7 +205,10 @@ In VyOS (and most Netfilter/iptables-based firewalls), traffic is filtered throu
 
 This controls incoming traffic destined for the VyOS router itself. For example, SSH access to the router or web management interfaces would be filtered by the INPUT chain.
 
-```bash hl_lines="4"
+```bash hl_lines="5"
+set firewall ipv4 input filter rule 5 action 'drop'
+set firewall ipv4 input filter rule 5 state 'invalid'
+set firewall ipv4 input filter rule 5 description 'Drop invalid state packets'
 set firewall ipv4 input filter rule 10 action 'accept'
 set firewall ipv4 input filter rule 10 state 'established'
 set firewall ipv4 input filter rule 10 state 'related'
@@ -228,7 +234,10 @@ commit; save
 
 This handles traffic passing through the router but not directed to or from it. If VyOS is acting as a router between networks, the FORWARD chain determines which packets are allowed to pass between them.
 
-```bash hl_lines="5"
+```bash hl_lines="6"
+set firewall ipv4 forward filter rule 5 action 'drop'
+set firewall ipv4 forward filter rule 5 state 'invalid'
+set firewall ipv4 forward filter rule 5 description 'Drop invalid state packets'
 set firewall ipv4 forward filter rule 20 action 'accept'
 set firewall ipv4 forward filter rule 20 description 'Allow Return traffic through the router'
 set firewall ipv4 forward filter rule 20 state 'established'
@@ -240,6 +249,23 @@ set firewall ipv4 forward filter rule 1000 inbound-interface name br0
 set firewall ipv4 forward filter default-action drop
 commit; save
 ```
+
+??? tip "Allow ICMP/Ping on WAN"
+    By default, the `drop` default-action blocks all ICMP on the WAN interface, including useful diagnostics like ping and Path MTU Discovery. If you want to allow limited ICMP traffic on the WAN, add the following rules to the input chain:
+
+    ```bash
+    set firewall ipv4 input filter rule 15 action 'accept'
+    set firewall ipv4 input filter rule 15 description 'Allow ICMP echo requests (ping) on WAN'
+    set firewall ipv4 input filter rule 15 protocol 'icmp'
+    set firewall ipv4 input filter rule 15 icmp type-name 'echo-request'
+    set firewall ipv4 input filter rule 15 inbound-interface name [WAN_INTERFACE]
+    set firewall ipv4 input filter rule 16 action 'accept'
+    set firewall ipv4 input filter rule 16 description 'Allow ICMP destination-unreachable on WAN'
+    set firewall ipv4 input filter rule 16 protocol 'icmp'
+    set firewall ipv4 input filter rule 16 icmp type-name 'destination-unreachable'
+    set firewall ipv4 input filter rule 16 inbound-interface name [WAN_INTERFACE]
+    commit; save
+    ```
 
 ## System
 
@@ -256,6 +282,31 @@ Login with your new user account to verify it works. Then delete the `vyos` user
 
 ```bash
 delete system login user vyos
+commit; save
+```
+
+### SSH
+
+Enable SSH access and restrict it to the LAN interface so the router cannot be accessed remotely from the WAN.
+
+```bash hl_lines="2"
+set service ssh port 22
+set service ssh listen-address 192.168.1.1
+set service ssh disable-password-authentication
+commit; save
+```
+
+This configuration:
+
+- Enables the SSH service on the default port
+- Binds SSH to the LAN address only, preventing WAN access
+- Disables password authentication, requiring SSH key-based login
+
+To add your public key for SSH key-based authentication:
+
+```bash hl_lines="1 2"
+set system login user [USERNAME] authentication public-keys [KEY_NAME] key [PUBLIC_KEY]
+set system login user [USERNAME] authentication public-keys [KEY_NAME] type ssh-rsa
 commit; save
 ```
 
@@ -294,4 +345,4 @@ commit; save
 Now your VyOS router is fully configured and ready to power your homelab! With a secure and efficient network in place, you can focus on building and exploring your homelab projects. Happy networking!
 
 [vyos]: https://vyos.io
-[download]: https://github.com/vyos/vyos-nightly-build/releases
+[downloading]: https://vyos.net/get/stream/

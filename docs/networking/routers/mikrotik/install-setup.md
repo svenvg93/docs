@@ -35,6 +35,15 @@ To configure the MikroTik router, you'll first need to establish a connection. W
 3. Find the default IP address of the MikroTik router (usually 192.168.88.1) and use SSH to connect.
 4. When prompted, enter the default username `admin` and leave the password field blank (default).
 
+!!! warning "Reset default configuration"
+    MikroTik routers ship with a default configuration that includes firewall rules, a DHCP server, and NAT. To avoid conflicts with the setup below, reset the router to a blank state first:
+
+    ```bash
+    /system reset-configuration no-defaults=yes
+    ```
+
+    The router will reboot. Reconnect and log in with `admin` and no password to continue.
+
 ## LAN
 
 Configure the LAN ports to establish a network connection for all your devices. This will ensure that both your homelab and internet access are set up properly, providing seamless connectivity throughout your network.
@@ -84,6 +93,13 @@ Next, we’ll enable DNS queries on the router and configure it to forward those
 set allow-remote-requests=yes
 ```
 
+!!! info "Static IP users"
+    If your WAN connection uses a static IP instead of DHCP, there is no upstream DNS server provided automatically. You need to configure one manually:
+
+    ```bash
+    /ip dns set servers=1.1.1.1,8.8.8.8
+    ```
+
 ## WAN
 
 We’ll need to configure the WAN interface to obtain an IP address from your ISP. In this setup, the physical interface `ether1` will be used to connect to your ISP. 
@@ -101,22 +117,22 @@ We’ll need to configure the WAN interface to obtain an IP address from your IS
     /interface ethernet set ether1 name=internet 
     /ip dhcp-client add interface=internet add-default-route=yes disabled=no use-peer-ntp=no 
     /interface list add name=WAN 
-    /interface list member add interface=internet list=WAN`
+    /interface list member add interface=internet list=WAN
     ```
 
 === "PPPoE with VLAN"
     ```bash hl_lines="2"
-    /interface add interface=ether1 name=vlan_int vlan-id=[VLAN_ID]
+    /interface vlan add interface=ether1 name=vlan_int vlan-id=[VLAN_ID]
     /interface pppoe-client add add-default-route=yes disabled=no interface=vlan_int name=internet use-peer-dns=yes user=[USERNAME] password=[PASSWORD] 
     /interface list add name=WAN 
-    /interface list member add interface=internet list=WAN`
+    /interface list member add interface=internet list=WAN
     ```
 
 === "PPPoE"
     ```bash hl_lines="1"
     /interface pppoe-client add add-default-route=yes disabled=no interface=ether1 name=internet use-peer-dns=yes user=[USERNAME] password=[PASSWORD]
     /interface list add name=WAN 
-    /interface list member add interface=internet list=WAN`
+    /interface list member add interface=internet list=WAN
     ```
 
 === "Static IP"
@@ -126,7 +142,7 @@ We’ll need to configure the WAN interface to obtain an IP address from your IS
     /ip route add gateway=[GATEWAY]
     /ip dns set servers=[DNS_SERVER]
     /interface list add name=WAN 
-    /interface list member add interface=internet list=WAN`
+    /interface list member add interface=internet list=WAN
     ```
 
 
@@ -172,6 +188,20 @@ We’ll create a new user account with the necessary privileges and then disable
 /user add name=[USERNAME] password=[PASSWORD] group=full
 /user disable admin
 ```
+
+??? tip "Restrict management services"
+    MikroTik routers have several management services enabled by default (API, Winbox, web, etc.) that are accessible from all interfaces. For better security, restrict these services to the LAN only:
+
+    ```bash
+    /ip service
+    set api disabled=yes
+    set api-ssl disabled=yes
+    set telnet disabled=yes
+    set www disabled=yes
+    set www-ssl disabled=yes
+    set ssh address=192.168.1.0/24
+    set winbox address=192.168.1.0/24
+    ```
 
 ### Hostname
 

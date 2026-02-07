@@ -16,7 +16,7 @@ Monitoring your systems and containers is essential for maintaining a reliable h
 2. Prometheus - Stores time-series metrics received from Alloy.
 3. Grafana - Provides visualization dashboards to analyze and monitor your system and container metrics.
 
-!!! info "Prerequisites"
+??? info "Prerequisites"
     Ensure you have the following installed before proceeding:
 
     - [Install Alloy] - Telemetry collector

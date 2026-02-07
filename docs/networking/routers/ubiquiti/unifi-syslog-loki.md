@@ -20,7 +20,7 @@ This guide we will only focus on device logs. Securtiy and firewall logs are out
 3. Unifi Devices - Network hardware (APs, switches, gateways) generating syslog messages.
 4. Grafana - Visualization platform for exploring and analyzing collected logs.
 
-!!! info "Prerequisites"
+??? info "Prerequisites"
     - Grafana Alloy installed (or can be deployed via Docker)
     - Grafana and Loki instance running (see the [System Logs with Loki][loki-setup] guide)
     - Unifi Controller with network devices configured

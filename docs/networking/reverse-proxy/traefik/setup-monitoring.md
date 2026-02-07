@@ -17,7 +17,7 @@ Traefik exposes metrics on EntryPoints, Routers, Services, and more. This guide 
 3. Loki - Aggregates log data, allowing for centralized logging alongside metrics.
 4. Grafana Alloy - Ships logs from your applications to Loki for efficient storage and querying.
 
-!!! info "Prerequisites"
+??? info "Prerequisites"
     This guide assumes you already have Grafana, Prometheus, Alloy, and Loki set up. See the following guides:
 
     - [Install Alloy](../../../observability/tools/install-alloy.md) - Telemetry collector setup

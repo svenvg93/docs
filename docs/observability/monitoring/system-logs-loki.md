@@ -16,7 +16,7 @@ Monitoring isn't just about metrics—it's about ensuring application health. Ce
 2. Grafana Alloy - Next-generation telemetry collector that ships logs from files to Loki with powerful processing capabilities.
 3. Grafana - Provides visualization and search capabilities for logs stored in Loki.
 
-!!! info "Prerequisites"
+??? info "Prerequisites"
     This guide assumes you have Docker, Docker Compose, and Grafana already installed. If you need to set up Grafana, check out the [Host & Container Monitoring guide][grafana-setup].
 
 ## Setup Loki
