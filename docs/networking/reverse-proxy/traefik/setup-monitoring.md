@@ -103,7 +103,7 @@ command:
   - "--log.format=json"
 ```
 
-1. :material-alert-circle: **File only** - Setting a filepath redirects logs to the file. They will no longer appear in `docker logs traefik`
+1. :material-alert-circle: **File only** - Setting a filepath redirects logs to the file. They will no longer appear in docker logs.
 
 2. **Add volume mapping** for log directory:
 
@@ -113,10 +113,9 @@ volumes:
   - /var/log/traefik:/log
 ```
 
-**Configuration explained:**
-
-- **Access Logs**: Logs every request (client IP, HTTP status, method, etc.) in JSON format
-- **Traefik Logs**: Captures Traefik service events (startup, shutdown, config changes) in JSON format
+??? tip "Log Types"
+    - **Access Logs**: Logs every request (client IP, HTTP status, method, etc.) in JSON format
+    - **Traefik Logs**: Captures Traefik service events (startup, shutdown, config changes) in JSON format
 
 Re-create the Traefik container to apply the changes:
 

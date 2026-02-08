@@ -6,7 +6,6 @@ tags:
 - cloudflare workers
 ---
 
-
 Instead of relying on Cloudflare's built-in Git integration, you can use GitHub Actions with Wrangler to deploy your site to Cloudflare Workers. This gives you full control over the build pipeline, allowing you to add steps like link checking or testing before deployment.
 
 ??? info "Prerequisites"
@@ -29,7 +28,7 @@ You will also need your **Account ID**, which can be found on the **Workers & Pa
 !!! warning "Keep your credentials secure"
     The API token grants access to your Cloudflare account. Never commit it directly to your repository.
 
-## Store Credentials in GitHub Secrets
+## GitHub Secrets
 
 Store both values as encrypted GitHub Secrets:
 
@@ -89,8 +88,5 @@ This workflow:
 - Triggers on every push to `main` or `master`, and can be run **manually** via `workflow_dispatch`
 - Checks out the repository and sets up Python for link checking
 - Installs **Wrangler v4** and deploys to Cloudflare Workers using the official action
-
-??? tip "Skip the link check"
-    If you don't need link checking, remove the **Set up Python** and **Check links** steps to speed up the workflow.
 
 [cloudflare dashboard]: https://dash.cloudflare.com/

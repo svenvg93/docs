@@ -1,11 +1,6 @@
 ---
-title: Dependabot Automation
-categories:
-- DevOps
-- CI/CD
-date: 2025-05-12
-description: Keep your Docker Compose dependencies secure and up to date by automating
-  Dependabot configuration with a simple Bash script and GitHub Actions.
+title: Dependabot for Docker Compose
+description: Keep your Docker Compose dependencies secure and up to date by automation.
 draft: false
 tags:
 - dependabot
@@ -13,13 +8,12 @@ tags:
 - github actions
 ---
 
-
-Keeping dependencies up to date is essential for security and maintainability, but manually managing updates across multiple `docker-compose.yml` files in a project can be tedious. In this post, I’ll show you a small Bash script I wrote to automate the generation of a `dependabot.yml` file. It scans your repo for all Docker Compose files and configures Dependabot to check them for updates monthly. It’s lightweight, efficient, and ensures you never miss a patch. Let’s dive in. We will automate the updating the `dependabot.yml` with Github Actions.
+Keeping dependencies up to date is important, but managing updates across multiple docker-compose.yml files can be a hassle. In this post, I’ll share a small Bash script that scans your repo for Compose files and automatically generates a dependabot.yml to check for updates monthly. Simple, lightweight, and no more missed patches.
 
 ## What is dependabot?
-[Dependabot] is a built-in GitHub tool that automatically checks your project dependencies for updates. It can open pull requests when new versions of your dependencies are available - helping you stay secure and up to date with minimal effort. For Docker Compose projects, it monitors container image tags and notifies you when a newer version is published.
+Dependabot is a built-in GitHub tool that automatically checks your project dependencies for updates. It can open pull requests when new versions of your dependencies are available - helping you stay secure and up to date with minimal effort. For Docker Compose projects, it monitors container image tags and notifies you when a newer version is published.
 
-## Create generate-dependabot.sh
+## Create `generate-dependabot.sh`
 
 In the top level of your directory, create a script file to generate `dependabot.yml`:
 
@@ -115,6 +109,5 @@ Make the script executable:
 chmod +x generate-dependabot.sh
 ```
 
-When you run the script using `./generate-dependabot.sh`, it will create (or update) the `.github/dependabot.yml` file with a list of all directories containing docker-compose.yml files. Commit this file to your Git repository — Dependabot will then automatically check for updated Docker image versions every month and open a pull request if any updates are found.
-
-You can change the interval to weekly or daily if you prefer.
+Running `./generate-dependabot.sh` will create or update `.github/dependabot.yml` with all directories that contain `docker-compose.yml` files. Commit the file, and Dependabot will automatically check for Docker image updates each month and open pull requests when updates are available.
+You can easily change the schedule to weekly or daily if you prefer.

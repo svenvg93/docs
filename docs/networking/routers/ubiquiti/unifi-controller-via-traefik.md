@@ -33,8 +33,8 @@ First, ensure Traefik can read dynamic configuration files. Add the following to
 **Command arguments:**
 ```yaml
 command:
-  - "--providers.file.directory=/etc/traefik/dynamic"
-  - "--providers.file.watch=true"
+  - "--providers.file.directory=/etc/traefik/dynamic" # (1)!
+  - "--providers.file.watch=true" # (2)!
   # ... your other Traefik arguments
 ```
 
@@ -43,14 +43,12 @@ command:
 volumes:
   - /var/run/docker.sock:/var/run/docker.sock:ro
   - traefik:/certs
-  - ./config:/etc/traefik/dynamic:ro
+  - ./config:/etc/traefik/dynamic:ro # (3)!
 ```
 
-**Configuration explained:**
-
-- **providers.file.directory**: Tells Traefik where to find dynamic configuration files for non-Docker services
-- **providers.file.watch**: Enables automatic reloading when configuration files change (no container restart needed)
-- **./config volume**: Maps the local `config` directory to Traefik's dynamic configuration path in read-only mode
+1. Points Traefik to dynamic config files for non-Docker services
+2. Enables automatic reload on config changes
+3. Maps the local config directory to Traefik’s dynamic path (read-only)
 
 ### Create Dynamic Configuration File
 
@@ -60,42 +58,32 @@ Create a new file at `./config/unifi.yml` with the following configuration:
 http:
   routers:
     unifi:
-      rule: "Host(`unifi.lab.example.com`)"
-      service: unifi-service
-      entryPoints:
-        - websecure
-      tls:
-        certResolver: le
+      rule: "Host(`unifi.lab.example.com`)" # (1)!
+      service: unifi-service # (2)!
+      entryPoints: 
+        - websecure # (3)!
+      tls: 
+        certResolver: le  # (4)!
 
   services:
     unifi-service:
       loadBalancer:
         servers:
-          - url: "https://192.168.1.1"
-        serversTransport: unifi-transport
+          - url: "https://192.168.1.1" # (5)!
+        serversTransport: unifi-transport # (6)!
 
-  serversTransports:
+  serversTransports: 
     unifi-transport:
-      insecureSkipVerify: true
+      insecureSkipVerify: true # (7)!
 ```
 
-**Configuration explained:**
-
-**Router Configuration:**
-
-- **rule**: The domain that will route to your Unifi Controller (replace `unifi.lab.example.com` with your domain)
-- **service**: References the service definition below for backend routing
-- **entryPoints**: Uses the `websecure` entry point for HTTPS traffic
-- **tls.certResolver**: Uses Let's Encrypt (`le`) to provide valid SSL certificates to clients
-
-**Service Configuration:**
-
-- **url**: The IP address and protocol of your Unifi Controller (replace `192.168.1.1` with your controller's IP)
-- **serversTransport**: References the custom transport configuration that handles SSL verification
-
-**Servers Transport:**
-
-- **insecureSkipVerify**: Set to `true` because Unifi Controller uses self-signed certificates internally. This allows Traefik to connect to the backend without SSL verification errors.
+1. The domain that will route to your Unifi Controller
+2. References the service definition below for backend routing
+3. Uses the `websecure` entry point for HTTPS traffic
+4. Uses Let's Encrypt (`le`) to provide valid SSL certificates to clients
+5. The IP address and protocol of your Unifi Controller (replace `192.168.1.1` with your controller's IP)
+6. References the custom transport configuration that handles SSL verification
+7. Set to `true` because Unifi Controller uses self-signed certificates internally. 
 
 ## How It Works
 

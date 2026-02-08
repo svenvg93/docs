@@ -6,10 +6,7 @@ tags:
 - cloudflare pages
 ---
 
-
-Cloudflare Pages monitors your Git repository and automatically rebuilds your site on every commit or merge. However, if your site uses scheduled or time-based content, there won't always be a new commit to trigger a rebuild at the right time. Deploy hooks solve this by giving you a webhook URL that triggers a build on demand.
-
-In this guide, we'll configure a Cloudflare deploy hook and use GitHub Actions to call it on a schedule, ensuring your site is always up to date.
+Cloudflare Pages rebuilds your site on every commit, but scheduled content won’t trigger a build automatically. Deploy hooks let you trigger a build via a webhook. his guide shows how to set up a deploy hook and use GitHub Actions to run it on a schedule, keeping your site always up to date.
 
 ??? info "Prerequisites"
     - A **Cloudflare Pages** project linked to a Git repository.
@@ -17,10 +14,10 @@ In this guide, we'll configure a Cloudflare deploy hook and use GitHub Actions t
 
 ## Create a Deploy Hook
 
-Cloudflare provides deploy hooks for Pages projects. A deploy hook is a unique URL that triggers a new build when it receives an HTTP POST request.
+Cloudflare Pages provides deploy hooks, unique URLs that trigger a new build when they receive an HTTP POST request.
 
 1. Log in to the [Cloudflare Dashboard].
-2. Navigate to **Compute (Workers)** -> **Workers & Pages**.
+2. Navigate to **Compute & AI** -> **Workers & Pages**.
 3. Open the project for which you want to set up the webhook.
 4. Go to the **Settings** tab and click the **+** icon next to **Deploy Hooks**.
 5. Provide a name for your webhook.
@@ -30,7 +27,7 @@ Cloudflare provides deploy hooks for Pages projects. A deploy hook is a unique U
 !!! warning "Keep your webhook URL secure"
     The deploy hook URL can trigger builds without authentication. Never commit it directly to your repository.
 
-## Store the Webhook in GitHub Secrets
+## GitHub Secrets
 
 To keep the webhook URL secure, store it as an encrypted GitHub Secret:
 
@@ -69,6 +66,7 @@ This workflow:
 - Sends a POST request to the Cloudflare deploy hook, which starts a new build
 
 ??? tip "Adjust the schedule"
-    The `cron` expression `0 9 * * *` means every day at 09:00 UTC. Adjust it to match your publishing schedule. See [crontab.guru](https://crontab.guru/) for help with cron syntax.
+    The `cron` expression `0 9 * * *` means every day at 09:00 UTC. Adjust it to match your publishing schedule. See [Crontab Guru] for help with cron syntax.
 
 [cloudflare dashboard]: https://dash.cloudflare.com/
+[Crontab Guru]: https://crontab.guru/

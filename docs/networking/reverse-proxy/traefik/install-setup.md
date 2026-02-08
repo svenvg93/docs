@@ -1,6 +1,6 @@
 ---
 title: Setup & Configuration
-description: Master the art of deploying Traefik in your environment. This comprehensive guide covers everything from installation to advanced configuration for seamless traffic management in your homelab.
+description: Learn to deploy and configure Traefik for seamless traffic management in your homelab.
 tags:
 - traefik
 - cloudflare
@@ -10,9 +10,9 @@ tags:
 
 ## What is Traefik
 
-Traefik is an open-source reverse proxy and load balancer, perfect for managing containerized applications in your homelab or home server. It integrates seamlessly with Docker, automatically detecting services, configuring routing, and securing connections with SSL. Designed for dynamic, self-hosted environments, Traefik adapts to changes in real-time, making it ideal for scaling and simplifying your setup.
+Traefik is an open-source reverse proxy and load balancer that works well with Docker, automatically detecting services and securing connections with SSL. It adapts in real-time, making it ideal for dynamic homelab setups.
 
-In this guide, we'll set up Traefik in Docker, configure automatic SSL certificates with Let's Encrypt, and test the setup with a simple service.
+This guide shows how to set up Traefik in Docker, enable automatic Let’s Encrypt SSL, and test it with a simple service.
 
 ## Setup Traefik with Docker
 
@@ -36,7 +36,7 @@ services:
     security_opt:
       - no-new-privileges:true
     environment:
-      - TZ=Europe/Amsterdam
+      - TZ=Europe/Amsterdam # (1)!
     env_file:
       - .env
     command:
@@ -66,7 +66,7 @@ services:
       - 8080:8080 # Traefik Dashboard
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - traefik_data:/certs
+      - traefik_data:/certs # (2)!
     healthcheck:
       test: wget --quiet --tries=1 --spider  http://127.0.0.1:8080/ping || exit 1
       interval: 5s
@@ -82,6 +82,10 @@ networks:
   traefik:
     name: traefik
 ```
+
+1. Change to your local timezone (e.g., `America/New_York`, `UTC`)
+2. Docker volume to store cerficates
+
 
 ## Cloudflare API
 
@@ -151,16 +155,12 @@ networks:
 ### Setting Up DNS and Testing
 
 1. **Configure DNS**: Point `whoami.your-domain.com` to your server's IP address in your DNS settings.
-
 2. **Verify DNS propagation**: Use `nslookup` or an online DNS checker to confirm the domain resolves to your server.
-
 3. **Start the service**:
    ```bash
    docker compose -f whoami/docker-compose.yml up -d
    ```
-
 4. **Test the setup**: Open your browser and navigate to `https://whoami.your-domain.com`. You should see the whoami response page with a valid SSL certificate.
-
 5. **Clean up** (optional): Once verified, you can remove the test service:
    ```bash
    docker compose -f whoami/docker-compose.yml down
