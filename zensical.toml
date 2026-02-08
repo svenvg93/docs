@@ -52,10 +52,10 @@ nav = [
       ]},
     ]},
     {"VPN & Tunnels" = [
-      "networking/self-hosting-securely-with-cloudflare-tunnels.md",
+      "networking/cloudflare-tunnels.md",
     ]},
     {"Other" = [
-      "networking/remote-packet-capture.md",
+      "networking/other/remote-packet-capture.md",
     ]},
   ]},
   {"Automation" = [
@@ -65,8 +65,10 @@ nav = [
       "automation/ansible/playbooks-roles-handlers.md",
       "automation/ansible/secrets-vault.md",
     ]},
-    {"CI/CD" = [
+    {"GitHub Actions" = [
       "automation/cicd/dependabot-docker-compose.md",
+      "automation/cicd/cloudflare-workers-github-actions.md",
+      "automation/cicd/cloudflare-pages-webhook-builds.md",
     ]},
   ]},
   {"Security" = [
@@ -74,26 +76,6 @@ nav = [
     {"Authentik" = [
       "security/selfhost-a-single-sign-on-mfa-with-authentik.md",
       "security/secure-your-cloudflare-tunnel-with-authentik.md",
-    ]},
-  ]},
-  {"Deployment" = [
-    {"Static Sites" = [
-      "tools/documentation/index.md",
-      "tools/documentation/deploy-zensical-on-cloudflare-workers.md",
-      "tools/documentation/deploying-a-hugo-site-with-cloudflare-workers.md",
-      "tools/documentation/jekyll-chirpy-blog-on-cloudflare-pages.md",
-      "tools/documentation/material-for-mkdocs-on-cloudflare-pages.md",
-      "tools/documentation/how-i-use-github-actions-to-update-my-blog-daily.md",
-    ]},
-  ]},
-  {"Tools" = [
-    {"Notifications" = [
-      "tools/notifications/index.md",
-      "tools/notifications/setup-ntfy-for-selfhosted-notifications.md",
-    ]},
-    {"Analytics" = [
-      "tools/analytics/index.md",
-      "tools/analytics/selfhost-your-website-analytics-with-umami.md",
     ]},
   ]},
 ]

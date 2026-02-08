@@ -1,0 +1,96 @@
+---
+title: Deploy to Cloudflare Workers
+description: Automate deployments to Cloudflare Workers using GitHub Actions and Wrangler.
+tags:
+- github actions
+- cloudflare workers
+---
+
+
+Instead of relying on Cloudflare's built-in Git integration, you can use GitHub Actions with Wrangler to deploy your site to Cloudflare Workers. This gives you full control over the build pipeline, allowing you to add steps like link checking or testing before deployment.
+
+??? info "Prerequisites"
+    - A **GitHub** repository with a Wrangler project (`wrangler.toml` or `wrangler.jsonc`).
+    - A **Cloudflare** account with Workers enabled.
+
+## Create Cloudflare API Token
+
+GitHub Actions needs an API token to authenticate with Cloudflare.
+
+1. Log in to the [Cloudflare Dashboard].
+2. Go to **My Profile** -> **API Tokens**.
+3. Click **Create Token**.
+4. Use the **Edit Cloudflare Workers** template.
+5. Click **Continue to summary** and then **Create Token**.
+6. Copy the token.
+
+You will also need your **Account ID**, which can be found on the **Workers & Pages** overview page in the Cloudflare Dashboard.
+
+!!! warning "Keep your credentials secure"
+    The API token grants access to your Cloudflare account. Never commit it directly to your repository.
+
+## Store Credentials in GitHub Secrets
+
+Store both values as encrypted GitHub Secrets:
+
+1. Go to your repository in GitHub.
+2. Navigate to **Settings** -> **Secrets and variables** -> **Actions**.
+3. Click **New repository secret** and add the following:
+
+| Name | Value |
+|---|---|
+| `CLOUDFLARE_API_TOKEN` | Your API token |
+| `CLOUDFLARE_ACCOUNT_ID` | Your account ID |
+
+## Create the GitHub Action
+
+Create a workflow file at `.github/workflows/deploy.yaml`:
+
+```yaml title=".github/workflows/deploy.yaml"
+name: Deploy to Cloudflare Workers
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  deployments: write
+
+jobs:
+  deploy:
+    name: Deploy to Cloudflare Workers
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Wrangler v4
+        run: npm install --save-dev wrangler@4
+
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy
+```
+
+This workflow:
+
+- Triggers on every push to `main` or `master`, and can be run **manually** via `workflow_dispatch`
+- Checks out the repository and sets up Python for link checking
+- Installs **Wrangler v4** and deploys to Cloudflare Workers using the official action
+
+??? tip "Skip the link check"
+    If you don't need link checking, remove the **Set up Python** and **Check links** steps to speed up the workflow.
+
+[cloudflare dashboard]: https://dash.cloudflare.com/
