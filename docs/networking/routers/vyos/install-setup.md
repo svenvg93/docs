@@ -209,7 +209,7 @@ In VyOS (and most Netfilter/iptables-based firewalls), traffic is filtered throu
 
 This controls incoming traffic destined for the VyOS router itself. For example, SSH access to the router or web management interfaces would be filtered by the INPUT chain.
 
-```bash hl_lines="5"
+```bash hl_lines="7"
 set firewall ipv4 input filter rule 5 action 'drop'
 set firewall ipv4 input filter rule 5 state 'invalid'
 set firewall ipv4 input filter rule 5 description 'Drop invalid state packets'
@@ -238,7 +238,7 @@ commit; save
 
 This handles traffic passing through the router but not directed to or from it. If VyOS is acting as a router between networks, the FORWARD chain determines which packets are allowed to pass between them.
 
-```bash hl_lines="6"
+```bash hl_lines="8"
 set firewall ipv4 forward filter rule 5 action 'drop'
 set firewall ipv4 forward filter rule 5 state 'invalid'
 set firewall ipv4 forward filter rule 5 description 'Drop invalid state packets'
@@ -257,7 +257,7 @@ commit; save
 ??? tip "Allow ICMP/Ping on WAN"
     By default, the `drop` default-action blocks all ICMP on the WAN interface, including useful diagnostics like ping and Path MTU Discovery. If you want to allow limited ICMP traffic on the WAN, add the following rules to the input chain:
 
-    ```bash
+    ```bash hl_lines="5 10"
     set firewall ipv4 input filter rule 15 action 'accept'
     set firewall ipv4 input filter rule 15 description 'Allow ICMP echo requests (ping) on WAN'
     set firewall ipv4 input filter rule 15 protocol 'icmp'
