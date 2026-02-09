@@ -42,6 +42,7 @@ nav = [
       ]},
       {"VyOS" = [
         "networking/routers/vyos/install-setup.md",
+        "networking/routers/vyos/monitoring.md"
       ]},
     ]},
     {"Reverse Proxy" = [
