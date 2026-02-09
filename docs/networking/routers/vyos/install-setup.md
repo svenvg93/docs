@@ -49,7 +49,7 @@ Create a bridge interface to combine all the ports into a single network. This w
 
 ```bash
 set interfaces bridge br0 
-set interfaces bridge br0 description LAN bridge
+set interfaces bridge br0 description LAN-bridge
 set interfaces bridge br0 address 192.168.1.1/24
 set interfaces bridge br0 member interface eth0
 commit; save
@@ -95,6 +95,10 @@ IP Address     MAC address        State    Lease start                Lease expi
 192.168.1.100  bc:24:11:82:b2:20  active   2025-03-19 17:31:03+00:00  2025-03-20 17:31:03+00:00  23:41:55     LAN     ubuntu-test  local
 192.168.1.101  bc:24:11:89:c8:77  active   2025-03-19 17:36:13+00:00  2025-03-20 17:36:13+00:00  23:47:05     LAN     ubuntu-test  local
 ```
+
+??? tip "SSH Access"
+    To simplify the configuration, you can now enable SSH, allowing you to copy and paste the remaining steps. 
+    Refer to the [SSH] section for instructions on how to do this.
 
 ### DNS
 
@@ -346,3 +350,4 @@ Now your VyOS router is fully configured and ready to power your homelab! With a
 
 [vyos]: https://vyos.io
 [downloading]: https://vyos.net/get/stream/
+[ssh] : #ssh
