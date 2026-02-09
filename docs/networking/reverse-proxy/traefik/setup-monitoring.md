@@ -20,10 +20,11 @@ Traefik exposes metrics on EntryPoints, Routers, Services, and more. This guide 
 ??? info "Prerequisites"
     This guide assumes you already have Grafana, Prometheus, Alloy, and Loki set up. See the following guides:
 
-    - [Install Alloy](../../../observability/tools/install-alloy.md) - Telemetry collector setup
-    - [Install Loki](../../../observability/tools/install-loki.md) - Log aggregation setup
-    - [Install Prometheus](../../../observability/tools/install-prometheus.md) - Metrics storage
-    - [Install Grafana](../../../observability/tools/install-grafana.md) - Visualization
+    - [Install Alloy] - Telemetry collector setup
+    - [Install Loki] - Log aggregation setup
+    - [Install Prometheus] - Metrics storage
+    - [Install Grafana] - Visualization
+
 
 ## Metrics
 
@@ -69,9 +70,10 @@ scrape_configs:
   - job_name: 'traefik'
     scrape_interval: 5s
     static_configs:
-      - targets: ['<traefik-ip>:8080']
+      - targets: ['<traefik-ip>:8080'] # (1)!
 ```
-Replace `<traefik-ip>` with your Traefik server's IP address.
+
+1. Replace `<traefik-ip>` with your Traefik server's IP address.
 
 To apply the configuration changes, restart the Prometheus containers:
 
@@ -191,3 +193,7 @@ Your monitoring setup is now complete. The dashboard provides insights into your
 [grafana-prometheus]: ../../../observability/monitoring/host-container-monitoring
 [here]: https://doc.traefik.io/traefik/observability/metrics/overview/#global-metrics
 [traefik dashboard]: https://github.com/svenvg93/Grafana-Dashboard/tree/master/traefik
+[Install Alloy]: ../../../observability/tools/install-alloy.md
+[Install Loki]: ../../../observability/tools/install-loki.md
+[Install Prometheus]: ../../../observability/tools/install-prometheus.md
+[Install Grafana]: ../../../observability/tools/install-grafana.md

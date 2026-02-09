@@ -6,7 +6,6 @@ tags:
 - firewall
 ---
 
-
 Setting up a [VyOS] router in your homelab gives you enterprise-grade networking with open-source flexibility. Running on standard amd64 hardware, VyOS delivers powerful routing and firewall features—far beyond what typical consumer routers offer.
 
 ## Installation
@@ -107,19 +106,17 @@ IP Address     MAC address        State    Lease start                Lease expi
 By default, VyOS doesn't function as a DNS proxy. Enable DNS forwarding from client devices to your upstream DNS servers:
 
 ```bash hl_lines="4"
-set service dns forwarding allow-from '192.168.1.0/24'
-set service dns forwarding listen-address '192.168.1.1'
-set service dns forwarding system
-set system name-server [DNS_SERVER]
+set service dns forwarding allow-from '192.168.1.0/24' # (1)!
+set service dns forwarding listen-address '192.168.1.1' # (2)!
+set service dns forwarding system # (3)!
+set system name-server [DNS_SERVER] # (4)!
 commit; save
 ```
 
-This configuration:
-
-- Allows DNS requests from devices in the 192.168.1.0/24 subnet
-- Sets your VyOS router (192.168.1.1) as the listening address for DNS requests
-- Enables system-wide DNS forwarding
-- Forwards requests to your specified upstream DNS server
+1. Allows DNS requests from devices in the 192.168.1.0/24 subnet
+2. Sets your VyOS router (192.168.1.1) as the listening address for DNS requests
+3. Enables system-wide DNS forwarding
+4. Forwards requests to your specified upstream DNS server
 
 ## WAN
 
@@ -128,26 +125,25 @@ Configure the WAN interface to obtain an IP address from your ISP. Select the ap
 === "DHCP with VLAN"
     ```bash hl_lines="1 2"
     set interfaces ethernet [WAN_INTERFACE] vif [VLAN_ID] address dhcp
-    set interfaces ethernet [WAN_INTERFACE] vif [VLAN_ID] description WAN-Interface
+    set interfaces ethernet [WAN_INTERFACE] vif [VLAN_ID] description Internet
     commit; save
     ```
 
 === "DHCP"
     ```bash
     set interfaces ethernet eth1 address dhcp
-    set interfaces ethernet eth1 description WAN-Interface
-    commit; save
+    set interfaces ethernet eth1 description Internet
     ```
 
 === "PPPoE with VLAN"
     ```bash hl_lines="1 2 3 4"
-    set interfaces ethernet [WAN_INTERFACE] vif [VLAN_ID] description WAN-Interface
+    set interfaces ethernet [WAN_INTERFACE] vif [VLAN_ID] description Internet
     set interfaces pppoe pppoe0 authentication username [USERNAME]
     set interfaces pppoe pppoe0 authentication password [PASSWORD]
     set interfaces pppoe pppoe0 source-interface [WAN_INTERFACE].[VLAN_ID]
     set interfaces pppoe pppoe0 default-route auto
     set interfaces pppoe pppoe0 mtu 1492
-    set interfaces pppoe pppoe0 description WAN-Interface
+    set interfaces pppoe pppoe0 description Internet
     commit; save
     ```
 
@@ -158,13 +154,13 @@ Configure the WAN interface to obtain an IP address from your ISP. Select the ap
     set interfaces pppoe pppoe0 source-interface [WAN_INTERFACE]
     set interfaces pppoe pppoe0 default-route auto
     set interfaces pppoe pppoe0 mtu 1492
-    set interfaces pppoe pppoe0 description WAN-Interface
+    set interfaces pppoe pppoe0 description Internet
     commit; save
     ```
 
 === "Static IP"
     ```bash hl_lines="1 2 4 5 6"
-    set interfaces ethernet [WAN_INTERFACE] description WAN-Interface
+    set interfaces ethernet [WAN_INTERFACE] description Internet
     set interfaces ethernet [WAN_INTERFACE] address [IP_ADDRESS]/[PREFIX_LENGTH]
     set interfaces ethernet [WAN_INTERFACE] mtu 1500
     set protocols static route 0.0.0.0/0 next-hop [GATEWAY]
@@ -197,7 +193,7 @@ L>* 192.168.1.1/32 is directly connected, br0, weight 1, 00:07:15
 Set up a NAT rule to translate all outgoing traffic from your local network to your public IP address. This enables devices in your homelab to access the internet using the router's public IP.
 
 ```bash hl_lines="2"
-set nat source rule 10 description 'Enable NAT on WAN-Interface'
+set nat source rule 10 description 'Enable NAT on WAN'
 set nat source rule 10 outbound-interface name [WAN_INTERFACE]
 set nat source rule 10 translation address 'masquerade'
 commit; save
@@ -295,26 +291,28 @@ commit; save
 
 Enable SSH access and restrict it to the LAN interface so the router cannot be accessed remotely from the WAN.
 
-```bash hl_lines="2"
-set service ssh port 22
-set service ssh listen-address 192.168.1.1
-set service ssh disable-password-authentication
+```bash
+set service ssh port 22 # (1)!
+set service ssh listen-address 192.168.1.1 # (2)!
+set service ssh disable-host-validation # (3)!
 commit; save
 ```
 
-This configuration:
-
-- Enables the SSH service on the default port
-- Binds SSH to the LAN address only, preventing WAN access
-- Disables password authentication, requiring SSH key-based login
+1. Enables the SSH service on the default port
+2. Binds SSH to the LAN address only, preventing WAN access
+3. Disable IP Address to Hostname lookup
 
 To add your public key for SSH key-based authentication:
 
-```bash hl_lines="1 2"
+```bash hl_lines="2 3"
+set service ssh disable-password-authentication # (1)!
 set system login user [USERNAME] authentication public-keys [KEY_NAME] key [PUBLIC_KEY]
 set system login user [USERNAME] authentication public-keys [KEY_NAME] type ssh-rsa
 commit; save
 ```
+
+1. Disables password authentication, requiring SSH key-based login
+
 
 ### Hostname
 
@@ -352,4 +350,4 @@ Now your VyOS router is fully configured and ready to power your homelab! With a
 
 [vyos]: https://vyos.io
 [downloading]: https://vyos.net/get/stream/
-[ssh] : #ssh
+[ssh]: #ssh

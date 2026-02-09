@@ -77,17 +77,15 @@ The `ansible.cfg` file is typically located either in your home directory or in 
 
 ```ini
 [defaults]
-inventory = ./inventory/hosts.yml
-host_key_checking = False
-retry_files_enabled = False
+inventory = ./inventory/hosts.yml # (1)!
+host_key_checking = False # (2)!
+retry_files_enabled = False # (3)!
 timeout = 10
 ```
 
-This configuration:
-
-- Points to your inventory file
-- Disables SSH host key prompts
-- Improves reliability by disabling retry files and adding a timeout
+1. Points to your inventory file
+2. Disables SSH host key prompts
+3. Improves reliability by disabling retry files and adding a timeout
 
 ### Define Your Inventory
 
