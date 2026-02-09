@@ -46,6 +46,8 @@ Configure the LAN ports to establish a network connection for all your devices. 
 
 Create a bridge interface to combine all the ports into a single network. This will enable seamless communication between all your devices on the same network.
 
+!!! tip "LAN Subnet"
+    This guide uses `192.168.1.0/24` as the LAN subnet. Change it everywhere if you modify it.
 
 ```bash
 set interfaces bridge br0 
