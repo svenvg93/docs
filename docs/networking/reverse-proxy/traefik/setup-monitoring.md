@@ -10,13 +10,6 @@ tags:
 
 Traefik exposes metrics on EntryPoints, Routers, Services, and more. This guide shows you how to collect these metrics with Prometheus and aggregate logs with Loki for a complete monitoring solution.
 
-## Key Components
-
-1. Traefik - Exposes metrics for monitoring various components of your services.
-2. Prometheus - Scrapes and stores metrics data from Traefik, providing a time-series database for easy access.
-3. Loki - Aggregates log data, allowing for centralized logging alongside metrics.
-4. Grafana Alloy - Ships logs from your applications to Loki for efficient storage and querying.
-
 ??? info "Prerequisites"
     This guide assumes you already have Grafana, Prometheus, Alloy, and Loki set up. See the following guides:
 

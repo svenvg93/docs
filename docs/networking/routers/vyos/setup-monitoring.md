@@ -45,7 +45,7 @@ Add the following configuration to your `prometheus.yml`:
 ```
 
 1. Replace `192.168.1.1:9100` with your router IP and metrics port.
-2. Label to indetify the system across the diffrent scrape jobs
+2. Label to identify the system across the different scrape jobs
 
 To apply the configuration changes, restart the Prometheus containers:
 
@@ -78,7 +78,7 @@ commit; save
 
 ### Grafana Alloy
 
-Create a new Alloy config file for Traefik log collection:
+Create a new Alloy config file for VyOS log collection:
 
 ```bash
 nano alloy/config/vyos-syslog.alloy
@@ -140,17 +140,16 @@ VyOS includes a built-in Blackbox Exporter that can be used to collect metrics a
 
 ### VyOS
 
-Enable blackbox exporter, so Prometheus can scrape the test resutls. In this example we only ass ICMP testing 
+Enable blackbox exporter, so Prometheus can scrape the test results. In this example we only add ICMP testing.
 
 ```bash
 set service monitoring prometheus blackbox-exporter listen-address '192.168.1.1'
-set service monitoring prometheus blackbox-exporter modules dns
 set service monitoring prometheus blackbox-exporter modules icmp name icmp preferred-ip-protocol ipv4
 ```
 
 ### Prometheus
 
-Enable the Blackbox Exporter so Prometheus can scrape the probe results.In this example, we configure ICMP (ping) checks only to measure basic connectivity and latency.
+Enable the Blackbox Exporter so Prometheus can scrape the probe results. In this example, we configure ICMP (ping) checks only to measure basic connectivity and latency.
 Add the following configuration to your `prometheus.yml`:
 
 ```yaml title="prometheus.yml" hl_lines="6 7 8 9 10 11 12 13 14 15 23 27"
@@ -184,7 +183,7 @@ Add the following configuration to your `prometheus.yml`:
 ```
 
 1. Target for Blackbox Exporter to ping.
-2. Label to indetify the system across the diffrent scrape jobs.
+2. Label to identify the system across the different scrape jobs.
 3. Replace `192.168.1.1:9115` with your router IP and metrics port.
 
 ## Grafana Dashboard
@@ -197,7 +196,8 @@ You can either create a custom dashboard or use a pre-built one:
 
 - **Pre-built Dashboard**: Use the ready-made [VyOS Dashboard] from GitHub
 
-Your monitoring setup is now complete. The dashboard provides insights into your VyOS router performance and helps identify issues quickly
+Your monitoring setup is now complete. The dashboard provides insights into your VyOS router performance and helps identify issues quickly.
+
 [Install Alloy]: ../../../observability/tools/install-alloy.md
 [Install Loki]: ../../../observability/tools/install-loki.md
 [Install Prometheus]: ../../../observability/tools/install-prometheus.md

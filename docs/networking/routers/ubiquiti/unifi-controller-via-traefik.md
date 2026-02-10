@@ -6,14 +6,7 @@ tags:
 - traefik
 ---
 
-Some services, like the Unifi Controller, use self-signed HTTPS certificates and don’t work with Traefik’s label-based auto-discovery. In these cases, use a file-based configuration.
-
-## Key Components
-
-1. Traefik - Reverse proxy that handles SSL termination and routes traffic to the Unifi Controller.
-2. Unifi Controller - Network management software running with self-signed HTTPS certificates.
-3. File Provider - Traefik's dynamic configuration system for non-Docker services.
-4. Let's Encrypt - Provides valid SSL certificates for external access without browser warnings.
+Some services, like the Unifi Controller, use self-signed HTTPS certificates and don't work with Traefik's label-based auto-discovery. In these cases, use a file-based configuration. Traefik connects to the controller's HTTPS backend, bypasses the self-signed certificate, and presents a valid Let's Encrypt certificate to your browser.
 
 ??? info "Prerequisites"
     - Traefik installed and configured (see the [Traefik Setup & Configuration][traefik-setup] guide)
@@ -26,30 +19,31 @@ Some services, like the Unifi Controller, use self-signed HTTPS certificates and
 First, ensure Traefik can read dynamic configuration files. Add the following to your Traefik container in `docker-compose.yml`:
 
 **Command arguments:**
-```yaml
+```yaml title="docker-compose.yml"
 command:
   - "--providers.file.directory=/etc/traefik/dynamic" # (1)!
   - "--providers.file.watch=true" # (2)!
   # ... your other Traefik arguments
 ```
 
+1. Points Traefik to dynamic config files for non-Docker services
+2. Enables automatic reload on config changes
+
 **Volume mounts:**
-```yaml
+```yaml title="docker-compose.yml" hl_lines="4"
 volumes:
   - /var/run/docker.sock:/var/run/docker.sock:ro
   - traefik:/certs
-  - ./config:/etc/traefik/dynamic:ro # (3)!
+  - ./config:/etc/traefik/dynamic:ro # (1)!
 ```
 
-1. Points Traefik to dynamic config files for non-Docker services
-2. Enables automatic reload on config changes
-3. Maps the local config directory to Traefik’s dynamic path (read-only)
+1. Maps the local config directory to Traefik’s dynamic path (read-only)
 
 ### Create Dynamic Configuration File
 
 Create a new file at `./config/unifi.yml` with the following configuration:
 
-```yaml
+```yaml title="unifi.yml" hl_lines="4 5 7 9 15 16 20"
 http:
   routers:
     unifi:
@@ -78,18 +72,28 @@ http:
 4. Uses Let's Encrypt (`le`) to provide valid SSL certificates to clients
 5. The IP address and protocol of your Unifi Controller (replace `192.168.1.1` with your controller's IP)
 6. References the custom transport configuration that handles SSL verification
-7. Set to `true` because Unifi Controller uses self-signed certificates internally. 
+7. Set to `true` because Unifi Controller uses self-signed certificates internally.
 
-## How It Works
+## Apply Configuration
 
-When you navigate to `unifi.lab.example.com`:
+Re-create the Traefik container to apply the changes:
 
-1. **DNS Resolution**: Your DNS resolves the domain to your Traefik server
-2. **SSL Termination**: Traefik presents a valid SSL certificate to your browser
-3. **Backend Connection**: Traefik connects to the Unifi Controller's HTTPS interface at `192.168.1.1`
-4. **Certificate Bypass**: The `insecureSkipVerify` setting allows Traefik to accept Unifi's self-signed certificate
-5. **Secure Access**: You access your Unifi Controller with a valid SSL certificate, no browser warnings
+```bash
+docker compose -f traefik/docker-compose.yml up -d --force-recreate
+```
 
-This file-based approach gives you full control over services that can't use Docker labels, while still benefiting from Traefik's reverse proxy capabilities and automatic SSL certificate management.
+## Verification
+
+After restarting, verify the configuration is working:
+
+1. Check Traefik logs for errors loading the file provider:
+
+```bash
+docker logs traefik | grep -i "unifi"
+```
+
+2. Navigate to `https://unifi.lab.example.com` in your browser and confirm:
+    - No SSL certificate warnings appear
+    - The Unifi Controller login page loads correctly
 
 [traefik-setup]: ../../reverse-proxy/traefik/install-setup

@@ -10,12 +10,6 @@ tags:
 
 Monitoring isn't just about metrics—it's about ensuring application health. Centralized logging with Loki and Grafana provides deeper insights by visualizing and searching logs, helping you quickly identify and resolve issues.
 
-## Key Components
-
-1. Loki - Log aggregation system that stores and indexes logs efficiently for querying and analysis.
-2. Grafana Alloy - Next-generation telemetry collector that ships logs from files to Loki with powerful processing capabilities.
-3. Grafana - Provides visualization and search capabilities for logs stored in Loki.
-
 ??? info "Prerequisites"
     This guide assumes you have Docker, Docker Compose, and Grafana already installed. If you need to set up Grafana, check out the [Host & Container Monitoring guide][grafana-setup].
 

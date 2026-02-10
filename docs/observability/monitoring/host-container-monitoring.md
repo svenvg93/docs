@@ -10,12 +10,6 @@ tags:
 
 Monitoring your systems and containers is essential for maintaining a reliable homelab or home server. This guide uses Grafana Alloy to collect both host and container metrics, with Prometheus for storage and Grafana for visualization.
 
-## Key Components
-
-1. Grafana Alloy - Collects host metrics (CPU, memory, disk, network) and container metrics from Docker.
-2. Prometheus - Stores time-series metrics received from Alloy.
-3. Grafana - Provides visualization dashboards to analyze and monitor your system and container metrics.
-
 ??? info "Prerequisites"
     Ensure you have the following installed before proceeding:
 

@@ -1,12 +1,6 @@
 ---
 title: Travel Router Setup
-categories:
-- Networking
-- Router
-date: 2025-04-05
-description: Learn how to set up your travel router for secure and reliable internet
-  on the go. Stay connected anywhere!
-draft: false
+description: Learn how to set up a GL.iNet travel router for secure and reliable internet on the go.
 tags:
 - travel router
 ---
@@ -19,54 +13,52 @@ Whether you travel frequently or just want a secure, stable connection on the go
     - Access to hotel/public Wi-Fi or Ethernet connection
     - Basic understanding of networking concepts
 
-## Hardware 
+## Hardware
 
-When it comes to a travel router, you want it to light and small. You don't want to carry your big heavy router from home with you. 
+When it comes to a travel router, you want it to be light and small. You don't want to carry a big heavy router from home with you. GL.iNet makes small Wi-Fi routers in the size of a pack of cards. One of the best bang for your buck devices is the Beryl AX (GL-MT3000), a compact Wi-Fi 6 travel router with a 2.5 Gbps WAN port, USB 3.0, and retractable antennas — all at just ~130g.
 
-In terms of the hardware GL-Inet makes small Wifi routers in the size of a pack of cards. 
-One of the best bang for your buck devices is the Beryl AX. The GL.iNet Beryl AX (GL-MT3000) is a compact Wi-Fi 6 travel router equipped with the following specifications:​
+Another reason to pick the GL.iNet Beryl AX is that it runs OpenWRT — this applies to all GL.iNet devices. Their routers ship with a user-friendly UI, but you still have full access to the standard OpenWrt LuCI interface if you want deeper customization. This makes them great for both beginners and advanced users who need flexibility for things like VPNs, VLANs, ad-blocking, and more.
 
-| Component | Specification |
-| --------- | ------------- |
-| **Processor** | MediaTek MT7981B |
-| **Memory** | 512MB DDR4 RAM |
-| **Storage** | 256MB NAND Flash |
-| **Wi-Fi Standards** | 802.11a/b/g/n/ac/ax (Wi-Fi 6) |
-| **Wi-Fi Speeds** | 2.4 GHz: 574 Mbps<br>5 GHz: 2402 Mbps |
-| **Antennas** | 2× retractable external antennas |
-| **Ethernet Ports** | 1× 2.5 Gbps WAN<br>1× 1 Gbps LAN |
-| **USB** | 1× USB 3.0 Type-A |
-| **Power** | 5V/3A via USB Type-C |
-| **Dimensions** | 105 × 68 × 24 mm |
-| **Weight** | ~130g |
+??? note "Full Specifications"
+    | Component | Specification |
+    | --------- | ------------- |
+    | **Processor** | MediaTek MT7981B |
+    | **Memory** | 512MB DDR4 RAM |
+    | **Storage** | 256MB NAND Flash |
+    | **Wi-Fi Standards** | 802.11a/b/g/n/ac/ax (Wi-Fi 6) |
+    | **Wi-Fi Speeds** | 2.4 GHz: 574 Mbps | 5 GHz: 2402 Mbps |
+    | **Antennas** | 2× retractable external antennas |
+    | **Ethernet Ports** | 1× 2.5 Gbps WAN | 1× 1 Gbps LAN |
+    | **USB** | 1× USB 3.0 Type-A |
+    | **Power** | 5V/3A via USB Type-C |
+    | **Dimensions** | 105 × 68 × 24 mm |
+    | **Weight** | ~130g |
 
-Other reason to pick GL.iNet Beryl AX is that it runs OpenWRT, this applies to all GL.iNet devices. Their routers ship with a user-friendly UI, but you still have full access to the standard OpenWrt LuCI interface if you want deeper customization. This makes them great for both beginners and advanced users who need flexibility for things like VPNs, VLANs, ad-blocking, and more. 
-
-## Initial setup
+## Initial Setup
 
 !!! info
     This setup is done with version `4.7.0` installed
 
-During the initial setup you can either connect via a ethernet cable or to the default Wireless network of the Beryl. 
+During the initial setup you can either connect via an Ethernet cable or to the default wireless network of the Beryl.
 
-In order to login to the Beryl you have to go  `https://192.168.8.1`. This will prompt you a setup wizard to configure a login password to login to the UI.
-As well as a the name and password for the wireless network. For now I leave the Wireless settings default, as I will change more settings later on. 
+Navigate to `https://192.168.8.1` to access the setup wizard. This will prompt you to configure a login password for the UI, as well as the name and password for the wireless network. For now, leave the wireless settings at their defaults — we will change more settings later on.
 
-## Connect to Internet 
+## Connect to Internet
 
-### Ethernet 
+### Ethernet
 
-For the best possible experience, it's best to connect the Beryl with an Ethernet cable when you have the possibility. Some hotels and Airbnbs have an Ethernet cable connected to the TV for streaming services. If you don't need those, for example, when you bring your own streaming device, you can connect this cable to the WAN port of the Beryl. The Beryl will automatically pick up an IP address from the DHCP server.  
+For the best possible experience, connect the Beryl with an Ethernet cable when you have the possibility. Some hotels and Airbnbs have an Ethernet cable connected to the TV for streaming services. If you don't need those — for example, when you bring your own streaming device — you can connect this cable to the WAN port of the Beryl. The Beryl will automatically pick up an IP address from the DHCP server.
 
-Please note that there might be security measures in place against this. If the Beryl does not get an IP address, the best option might be to connect the Beryl via WiFi as explained below.
+!!! warning "Ethernet may be blocked"
+    Some networks have MAC-based or port-based security that prevents unknown devices from connecting. If the Beryl does not get an IP address, connect via Wi-Fi instead.
 
-### Connect to WiFi 
+### Wi-Fi
 
 On the main dashboard, locate the **Repeater** section and click **Connect** to join the Beryl to an existing wireless network. Select the desired network, enter the password if required, and keep all other settings as default.  
 
 If an authentication portal is needed, open a browser on your device to complete the login process.
 
-## Wireless network
+## Wireless Network
 
 By default, the Beryl has separate networks for 2.4GHz and 5GHz. To simplify things, we'll give them the same name, allowing devices to automatically choose the best band based on signal strength and coverage.  
 
@@ -87,4 +79,12 @@ By default, the Beryl has separate networks for 2.4GHz and 5GHz. To simplify thi
 
 Repeat these steps for the 2.4GHz network.
 
-Once you've updated the 2.4GHz network settings, your Beryl is ready to go—use it anywhere you like!
+## Verification
+
+Once both bands are configured, verify your setup:
+
+1. Connect a device to the Beryl's wireless network.
+2. Confirm you have internet access by browsing to any website.
+3. Check the Beryl dashboard at `https://192.168.8.1` and verify the **Repeater** or **WAN** connection shows as active.
+
+Your Beryl is now ready to go — use it anywhere you like!

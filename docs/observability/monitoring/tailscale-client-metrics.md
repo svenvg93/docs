@@ -13,12 +13,6 @@ Tailscale makes secure networking easy, but how do you monitor its performance? 
 !!! info "Requirements"
     Setting up Prometheus and Grafana is beyond the scope of this post. If you're interested in setting them up, check out this [guide].
 
-## Key Components
-
-1. Tailscale - Provides client metrics including network traffic, routes, and health status.
-2. Prometheus - Scrapes and stores time-series metrics from Tailscale's metrics endpoint.
-3. Grafana - Visualizes Tailscale metrics for monitoring your mesh VPN performance.
-
 ## Configure Tailscale
 Tailscale offers clients [metrics] which can scraped by Prometheus. These are metrics as the amount of advertised routes in case of a subnet router, throughput for in and outbound packets. Both direct traffic as via the Tailscale DERP relay. 
 

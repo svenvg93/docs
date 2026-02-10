@@ -10,12 +10,6 @@ tags:
 
 Centralize your Docker container logs with Loki and Grafana Alloy. This guide configures Alloy to collect logs from all running containers and forward them to Loki for querying and visualization in Grafana.
 
-## Key Components
-
-1. Loki - Log aggregation system that stores and indexes logs efficiently for querying and analysis.
-2. Grafana Alloy - Telemetry collector that discovers and ships Docker container logs to Loki.
-3. Grafana - Provides visualization and search capabilities for logs stored in Loki.
-
 ??? info "Prerequisites"
     Ensure you have the following installed before proceeding:
 
