@@ -17,7 +17,7 @@ VyOS has built-in support for Prometheus exporters and Syslog log forwarding, ma
     - [Install Grafana] - Visualization
 
 
-## Metrics
+## System Metrics
 
 ### VyOS
 
@@ -36,27 +36,22 @@ To ensure Prometheus collects metrics from your VyOS router, you need to add a s
 
 Add the following configuration to your `prometheus.yml`:
 ```yaml title="prometheus.yml" hl_lines="5"
-scrape_configs:
-  - job_name: 'VyOS'
+  - job_name: 'vyos'
     scrape_interval: 5s
     static_configs:
-      - targets: ['<router-ip>:9100'] # (1)!
+      - targets: ['192.168.1.1:9100'] # (1)!
+        labels:
+         router: vyos # (2)!
 ```
 
-1. Replace `<router-ip>:9100` with your router IP and metrics port.
+1. Replace `192.168.1.1:9100` with your router IP and metrics port.
+2. Label to indetify the system across the diffrent scrape jobs
 
 To apply the configuration changes, restart the Prometheus containers:
 
 ```bash
 docker restart prometheus
 ```
-
-### Internet Connection Montioring
-
-Todo
-
-Internet connection monitoring
-https://docs.vyos.io/en/latest/configuration/service/monitoring.html#blackbox-exporter
 
 ## Logs
 
@@ -135,11 +130,72 @@ Restart Alloy to pick up the new configuration:
 docker restart alloy
 ```
 
+## Connection Metrics
+
+VyOS includes a built-in Blackbox Exporter that can be used to collect metrics about your internet connection, such as reachability and latency.
+
+### VyOS
+
+Enable blackbox exporter, so Prometheus can scrape the test resutls. In this example we only ass ICMP testing 
+
+```bash
+set service monitoring prometheus blackbox-exporter listen-address '192.168.1.1'
+set service monitoring prometheus blackbox-exporter modules dns
+set service monitoring prometheus blackbox-exporter modules icmp name icmp preferred-ip-protocol ipv4
+```
+
+### Prometheu
+
+Enable the Blackbox Exporter so Prometheus can scrape the probe results.In this example, we configure ICMP (ping) checks only to measure basic connectivity and latency.
+Add the following configuration to your `prometheus.yml`:
+
+```yaml title="prometheus.yml" hl_lines="6 7 8 9 10 11 12 13 14 15 23 27 "
+  - job_name: 'blackbox_icmp'
+    scrape_interval: 15s
+    metrics_path: /probe
+    params:
+      module: [icmp]
+    static_configs:
+      - targets: ['connectivitycheck.gstatic.com'] # (1)!
+        labels:
+          endpoint: "Google"
+      - targets: ['dualstack.nonssl.global.fastly.net']
+        labels:
+          endpoint: "Fastly"
+      - targets: ['workers.dev']
+        labels:
+          endpoint: "Cloudflare"
+    relabel_configs:
+      # Set the target for blackbox
+      - source_labels: [__address__]
+        target_label: __param_target
+
+      # Set the instance to match your router hostname
+      - target_label: router # (2_ !
+        replacement: vyos
+
+      # Point scrape to blackbox exporter itself
+      - target_label: __address__
+        replacement: 192.168.1.1:9115 # (3)!
+```
+
+1. Target for Blackbox Exporter to ping.
+2. Label to indetify the system across the diffrent scrape jobs.
+3. Replace `192.168.1.1:9115` with your router IP and metrics port.
+
+## Grafana Dashboard
+
+Now you can visualize the collected metrics and logs in Grafana.
+
 ### Creating Your Dashboard
 
-Coming Soon!
+You can either create a custom dashboard or use a pre-built one:
 
+- **Pre-built Dashboard**: Use the ready-made [VyOS Dashboard] from GitHub
+
+Your monitoring setup is now complete. The dashboard provides insights into your Traefik instance's performance and helps identify issues quickly
 [Install Alloy]: ../../../observability/tools/install-alloy.md
 [Install Loki]: ../../../observability/tools/install-loki.md
 [Install Prometheus]: ../../../observability/tools/install-prometheus.md
 [Install Grafana]: ../../../observability/tools/install-grafana.md
+[VyOS Dashboard]: https://github.com/svenvg93/Grafana-Dashboard/tree/master/vyos
