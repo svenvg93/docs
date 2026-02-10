@@ -40,7 +40,7 @@ nav = [
       {"Mikrotik" = [
         "networking/routers/mikrotik/install-setup.md",
       ]},
-      {"GL-Inet" = [
+      {"GL.iNet" = [
         "networking/routers/gl-inet/travel-router-setup.md",
       ]},
       {"VyOS" = [

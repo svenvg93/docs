@@ -35,7 +35,7 @@ set service monitoring prometheus node-exporter port 9100 # (2)!
 To ensure Prometheus collects metrics from your VyOS router, you need to add a scrape configuration to your existing Prometheus configuration.
 
 Add the following configuration to your `prometheus.yml`:
-```yaml title="prometheus.yml" hl_lines="5"
+```yaml title="prometheus.yml" hl_lines="4 6"
   - job_name: 'vyos'
     scrape_interval: 5s
     static_configs:
@@ -92,19 +92,19 @@ loki.relabel "vyos_syslog" {
   // Map hostname from syslog header
   rule {
     source_labels = ["__syslog_message_hostname"]
-    target_label  = "host"
+    target_label  = "host" # (1)!
   }
 
   // Map application name
   rule {
     source_labels = ["__syslog_message_app_name"]
-    target_label  = "service_name"
+    target_label  = "service_name" # (2)!
   }
 
   // Map syslog severity level
   rule {
     source_labels = ["__syslog_message_severity"]
-    target_label  = "detected_level"
+    target_label  = "detected_level" # (3)!
   }
 }
 
@@ -123,6 +123,10 @@ loki.source.syslog "vyos" {
   forward_to    = [loki.write.default.receiver]
 }
 ```
+
+1. Maps the syslog hostname to the `host` label.
+2. Maps the syslog application to the `service_name` label.
+3. Maps the syslog log level to the `detected_level` label.
 
 Restart Alloy to pick up the new configuration:
 
@@ -144,7 +148,7 @@ set service monitoring prometheus blackbox-exporter modules dns
 set service monitoring prometheus blackbox-exporter modules icmp name icmp preferred-ip-protocol ipv4
 ```
 
-### Prometheu
+### Prometheus
 
 Enable the Blackbox Exporter so Prometheus can scrape the probe results.In this example, we configure ICMP (ping) checks only to measure basic connectivity and latency.
 Add the following configuration to your `prometheus.yml`:
@@ -171,8 +175,8 @@ Add the following configuration to your `prometheus.yml`:
         target_label: __param_target
 
       # Set the instance to match your router hostname
-      - target_label: router # (2)!
-        replacement: vyos
+      - target_label: router 
+        replacement: vyos # (2)!
 
       # Point scrape to blackbox exporter itself
       - target_label: __address__

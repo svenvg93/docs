@@ -12,35 +12,12 @@ tags:
 ---
 
 
-Whether you're a digital nomad, a frequent traveler, or just someone who values a secure and stable internet connection on the go, a travel router can be a game-changer. In this guide, we'll walk you through everything you need to know about setting up your travel router—from choosing the right model securing your connection, and optimizing performance. Stay connected, stay secure, and make the most of your travel router wherever you go!
-
-## Key Components
-
-1. GL.iNet Beryl AX (GL-MT3000) - Compact Wi-Fi 6 travel router with dual-band support and VPN capabilities.
-2. OpenWRT - Open-source router firmware providing advanced customization and control.
-3. VPN Support - Built-in support for WireGuard and OpenVPN for encrypted connections.
-4. Wi-Fi 6 (802.11ax) - Latest wireless standard offering improved speed and efficiency.
+Whether you travel frequently or just want a secure, stable connection on the go, a travel router is a game-changer. This guide covers everything from choosing the right model to securing and optimizing your connection, helping you stay connected wherever you are.
 
 ??? info "Prerequisites"
     - GL.iNet Beryl AX router or similar GL.iNet device running OpenWRT
     - Access to hotel/public Wi-Fi or Ethernet connection
     - Basic understanding of networking concepts
-
-## Why
-
-Building a travel router can be a game-changer, whether you're on the road for work, vacation, or digital nomad life. Here are four solid reasons to make one:
-
-1. Better Security on Public Wi-Fi
-Public networks in hotels, airports, and cafés are often insecure. A travel router lets you connect all your devices through a single, encrypted VPN tunnel, reducing exposure to potential threats.
-
-2. Bypass Device Limits & Captive Portals
-Some hotel Wi-Fi networks limit the number of connected devices or require logging in via a captive portal. A travel router can authenticate once and share the connection with all your devices, avoiding multiple logins.
-
-3. Consistent Network for Your Devices
-Keep your home-like network setup wherever you go. Your devices (laptop, phone, smart TV, etc.) will always connect to the travel router’s SSID, eliminating the need to reconfigure connections each time you switch locations.
-
-4. Built-in VPN for Privacy
-You can set up a VPN (WireGuard, OpenVPN) on your travel router to encrypt traffic.
 
 ## Hardware 
 
@@ -67,7 +44,8 @@ Other reason to pick GL.iNet Beryl AX is that it runs OpenWRT, this applies to a
 
 ## Initial setup
 
-This setup is done with version `4.7.0` installed
+!!! info
+    This setup is done with version `4.7.0` installed
 
 During the initial setup you can either connect via a ethernet cable or to the default Wireless network of the Beryl. 
 
@@ -93,6 +71,7 @@ If an authentication portal is needed, open a browser on your device to complete
 By default, the Beryl has separate networks for 2.4GHz and 5GHz. To simplify things, we'll give them the same name, allowing devices to automatically choose the best band based on signal strength and coverage.  
 
 **Steps to configure**:
+
 1. **Go to** the **Wireless** section in the side menu.
 2. **Click on** `Modify`.
 3. **Set the TX Power to Medium**
