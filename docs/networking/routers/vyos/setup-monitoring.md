@@ -171,7 +171,7 @@ Add the following configuration to your `prometheus.yml`:
         target_label: __param_target
 
       # Set the instance to match your router hostname
-      - target_label: router # (2_ !
+      - target_label: router # (2) !
         replacement: vyos
 
       # Point scrape to blackbox exporter itself
@@ -193,7 +193,7 @@ You can either create a custom dashboard or use a pre-built one:
 
 - **Pre-built Dashboard**: Use the ready-made [VyOS Dashboard] from GitHub
 
-Your monitoring setup is now complete. The dashboard provides insights into your Traefik instance's performance and helps identify issues quickly
+Your monitoring setup is now complete. The dashboard provides insights into your VyOS router performance and helps identify issues quickly
 [Install Alloy]: ../../../observability/tools/install-alloy.md
 [Install Loki]: ../../../observability/tools/install-loki.md
 [Install Prometheus]: ../../../observability/tools/install-prometheus.md
