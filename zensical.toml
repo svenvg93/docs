@@ -39,6 +39,8 @@ nav = [
       ]},
       {"Mikrotik" = [
         "networking/routers/mikrotik/install-setup.md",
+   #     "networking/routers/mikrotik/port-forwarding.md",
+   #     "networking/routers/mikrotik/wireguard.md",
    #     "networking/routers/mikrotik/setup-monitoring.md",
       ]},
       {"GL.iNet" = [
