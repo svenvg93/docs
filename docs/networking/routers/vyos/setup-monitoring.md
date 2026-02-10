@@ -171,7 +171,7 @@ Add the following configuration to your `prometheus.yml`:
         target_label: __param_target
 
       # Set the instance to match your router hostname
-      - target_label: router # (2) !
+      - target_label: router # (2)!
         replacement: vyos
 
       # Point scrape to blackbox exporter itself
