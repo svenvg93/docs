@@ -39,6 +39,7 @@ nav = [
       ]},
       {"Mikrotik" = [
         "networking/routers/mikrotik/install-setup.md",
+   #     "networking/routers/mikrotik/setup-monitoring.md",
       ]},
       {"GL.iNet" = [
         "networking/routers/gl-inet/travel-router-setup.md",
@@ -73,15 +74,8 @@ nav = [
       "automation/cicd/dependabot-docker-compose.md",
       "automation/cicd/cloudflare-workers-github-actions.md",
       "automation/cicd/cloudflare-pages-webhook-builds.md",
-    ]},
-  ]},
-  {"Security" = [
-    "security/index.md",
-    {"Authentik" = [
-      "security/selfhost-a-single-sign-on-mfa-with-authentik.md",
-      "security/secure-your-cloudflare-tunnel-with-authentik.md",
-    ]},
-  ]},
+    ]}
+  ]}
 ]
 
 # Theme Configuration
@@ -103,8 +97,8 @@ features = [
   "navigation.instant.prefetch",
   "navigation.path",
   "navigation.sections",
-  "navigation.tabs",
-  "navigation.tabs.sticky",
+#  "navigation.tabs",
+#  "navigation.tabs.sticky",
   "navigation.top",
   "navigation.tracking",
   "search.highlight",

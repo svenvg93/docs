@@ -83,8 +83,8 @@ networks:
     name: traefik
 ```
 
-1. Change to your local timezone (e.g., `America/New_York`, `UTC`)
-2. Docker volume to store cerficates
+1. :material-clock-outline: **Timezone** - Change to your local timezone (e.g., `America/New_York`, `UTC`)
+2. :material-harddisk: **Certificates** - Docker volume to store certificates
 
 
 ## Cloudflare API

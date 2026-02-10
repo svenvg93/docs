@@ -113,10 +113,10 @@ set system name-server [DNS_SERVER] # (4)!
 commit; save
 ```
 
-1. Allows DNS requests from devices in the 192.168.1.0/24 subnet
-2. Sets your VyOS router (192.168.1.1) as the listening address for DNS requests
-3. Enables system-wide DNS forwarding
-4. Forwards requests to your specified upstream DNS server
+1. :material-shield-check: **Allow From** - Allows DNS requests from devices in the 192.168.1.0/24 subnet
+2. :material-server: **Listen Address** - Sets your VyOS router (192.168.1.1) as the listening address for DNS requests
+3. :material-dns: **System DNS** - Enables system-wide DNS forwarding
+4. :material-arrow-right: **Upstream DNS** - Forwards requests to your specified upstream DNS server
 
 ## WAN
 
@@ -298,9 +298,9 @@ set service ssh disable-host-validation # (3)!
 commit; save
 ```
 
-1. Enables the SSH service on the default port
-2. Binds SSH to the LAN address only, preventing WAN access
-3. Disable IP Address to Hostname lookup
+1. :material-network: **Port** - Enables the SSH service on the default port
+2. :material-server: **Listen Address** - Binds SSH to the LAN address only, preventing WAN access
+3. :material-dns: **Host Validation** - Disable IP Address to Hostname lookup
 
 To add your public key for SSH key-based authentication:
 
@@ -311,7 +311,7 @@ set system login user [USERNAME] authentication public-keys [KEY_NAME] type ssh-
 commit; save
 ```
 
-1. Disables password authentication, requiring SSH key-based login
+1. :material-lock: **Password Auth** - Disables password authentication, requiring SSH key-based login
 
 
 ### Hostname

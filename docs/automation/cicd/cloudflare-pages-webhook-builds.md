@@ -47,7 +47,7 @@ name: Scheduled Cloudflare Pages Build
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 9 * * *"
+    - cron: "0 9 * * *" # (1)!
 
 jobs:
   webhook:
@@ -58,6 +58,8 @@ jobs:
         run: |
           curl -X POST {% raw %}${{ secrets.CLOUDFLARE_WEBHOOK }}{% endraw %}
 ```
+
+1. :material-clock-outline: **Schedule** - Runs daily at 09:00 UTC. Adjust the cron expression to match your publishing schedule.
 
 This workflow:
 

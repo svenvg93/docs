@@ -1,5 +1,5 @@
 ---
-title: Unifi Syslog
+title: Syslog to Loki
 description: Send Unifi Syslog to Loki with Alloy
 tags:
 - unifi
@@ -48,13 +48,13 @@ loki.relabel "unifi_syslog" {
   // Map syslog severity number to named level
   rule {
     source_labels = ["__syslog_message_severity"]
-    target_label  = "detected_level"
+    target_label  = "detected_level" // (1)!
   }
 
   // Map hostname from syslog header
   rule {
     source_labels = ["__syslog_message_hostname"]
-    target_label  = "host"
+    target_label  = "host" // (2)!
   }
 }
 
@@ -62,7 +62,7 @@ loki.source.syslog "unifi" {
   listener {
     address       = "0.0.0.0:514"
     protocol      = "udp"
-    syslog_format = "rfc3164"
+    syslog_format = "rfc3164" // (3)!
     labels        = {
       job      = "unifi",
     }
@@ -89,17 +89,17 @@ loki.process "unifi" {
 
   // Output just the message content
   stage.output {
-    source = "message"
+    source = "message" // (4)!
   }
 
   forward_to = [loki.write.default.receiver]
 }
 ```
 
-1. Maps the syslog severity to the `detected_level` label, with normalization rules to standardize values (e.g., `emergency` → `critical`, `notice` → `info`).
-2. Maps the syslog hostname to the `host` label (e.g., `UCG-Fiber`, `U7-Pro-Wall`).
-3. Unifi devices use RFC3164 syslog format over UDP.
-4. Outputs only the message content, removing metadata already captured as labels.
+1. :material-alert: **Log Level** - Maps the syslog severity to the `detected_level` label, with normalization rules to standardize values (e.g., `emergency` → `critical`, `notice` → `info`).
+2. :material-server: **Host Label** - Maps the syslog hostname to the `host` label (e.g., `UCG-Fiber`, `U7-Pro-Wall`).
+3. :material-network: **Syslog Format** - Unifi devices use RFC3164 syslog format over UDP.
+4. :material-text-box: **Output** - Outputs only the message content, removing metadata already captured as labels.
 
 !!! note "Syslog port"
     Ensure your Alloy `docker-compose.yml` exposes UDP port 514:
@@ -117,7 +117,11 @@ docker restart alloy
 
 ## Verification
 
-After configuring your Unifi devices, logs should start flowing to Loki within seconds.
+**Check Alloy components:**
+
+Open the Alloy Web UI and verify the `loki.source.syslog` component is healthy.
+
+**Verify logs in Grafana:**
 
 1. Open Grafana and navigate to **Explore**
 2. Select **Loki** as the datasource

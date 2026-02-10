@@ -139,6 +139,12 @@ Restart Alloy to apply the new configuration:
 docker restart alloy
 ```
 
+## Verification
+
+**Check Alloy components:**
+
+Open the Alloy Web UI and verify the `loki.source.docker` component is healthy.
+
 ## Grafana
 
 !!! info "Loki Datasource"

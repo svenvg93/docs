@@ -66,7 +66,7 @@ scrape_configs:
       - targets: ['<traefik-ip>:8080'] # (1)!
 ```
 
-1. Replace `<traefik-ip>` with your Traefik server's IP address.
+1. :material-server: **Traefik IP** - Replace `<traefik-ip>` with your Traefik server's IP address.
 
 To apply the configuration changes, restart the Prometheus containers:
 
@@ -168,6 +168,20 @@ Restart Alloy to pick up the new configuration:
 
 ```bash
 docker restart alloy
+```
+
+## Verification
+
+**Check Alloy components:**
+
+Open the Alloy Web UI and verify the `loki.source.file` component is healthy.
+
+**Verify logs in Grafana:**
+
+Query for Traefik logs in Grafana's Explore view using LogQL:
+
+```logql
+{job="traefik"}
 ```
 
 ## Grafana Dashboard

@@ -127,9 +127,7 @@ Verify metrics are being collected:
 
 **Check Alloy components:**
 
-```bash
-docker logs alloy | grep -i "unix\|cadvisor"
-```
+Open the Alloy Web UI and verify the `prometheus.exporter.unix` and `prometheus.exporter.cadvisor` components are healthy.
 
 ## Conclusion
 

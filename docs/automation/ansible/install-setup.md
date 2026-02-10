@@ -83,9 +83,9 @@ retry_files_enabled = False # (3)!
 timeout = 10
 ```
 
-1. Points to your inventory file
-2. Disables SSH host key prompts
-3. Improves reliability by disabling retry files and adding a timeout
+1. :material-file-document: **Inventory** - Points to your inventory file
+2. :material-key-remove: **Host Key Check** - Disables SSH host key prompts
+3. :material-timer-outline: **Reliability** - Improves reliability by disabling retry files and adding a timeout
 
 ### Define Your Inventory
 

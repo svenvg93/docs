@@ -28,8 +28,8 @@ set service monitoring prometheus node-exporter listen-address 192.168.1.1 # (1)
 set service monitoring prometheus node-exporter port 9100 # (2)!
 ```
 
-1. The IP address or hostname of the router’s Prometheus metrics endpoint
-2. The TCP port used by the router to expose Prometheus metrics
+1. :material-server: **Listen Address** - The IP address or hostname of the router's Prometheus metrics endpoint
+2. :material-network: **Port** - The TCP port used by the router to expose Prometheus metrics
 
 ### Prometheus
 To ensure Prometheus collects metrics from your VyOS router, you need to add a scrape configuration to your existing Prometheus configuration.
@@ -44,8 +44,8 @@ Add the following configuration to your `prometheus.yml`:
          router: vyos # (2)!
 ```
 
-1. Replace `192.168.1.1:9100` with your router IP and metrics port.
-2. Label to identify the system across the different scrape jobs
+1. :material-router-network: **Target** - Replace `192.168.1.1:9100` with your router IP and metrics port.
+2. :material-tag: **Label** - Label to identify the system across the different scrape jobs
 
 To apply the configuration changes, restart the Prometheus containers:
 
@@ -70,11 +70,11 @@ set system syslog remote 192.168.1.101 protocol 'udp' # (5)!
 commit; save
 ```
 
-1. Logs all facilities at info level locally
-2. Logs local7 facility at debug level for detailed diagnostics
-3. Forwards all log facilities to the remote syslog collector
-4. Port of the remote syslog collector
-5. Uses UDP as the transport protocol
+1. :material-text-box: **Local Logging** - Logs all facilities at info level locally
+2. :material-bug: **Debug Logging** - Logs local7 facility at debug level for detailed diagnostics
+3. :material-server-network: **Remote Host** - Forwards all log facilities to the remote syslog collector
+4. :material-network: **Port** - Port of the remote syslog collector
+5. :material-protocol: **Protocol** - Uses UDP as the transport protocol
 
 ### Grafana Alloy
 
@@ -124,9 +124,9 @@ loki.source.syslog "vyos" {
 }
 ```
 
-1. Maps the syslog hostname to the `host` label.
-2. Maps the syslog application to the `service_name` label.
-3. Maps the syslog log level to the `detected_level` label.
+1. :material-server: **Host Label** - Maps the syslog hostname to the `host` label.
+2. :material-application: **Service Name** - Maps the syslog application to the `service_name` label.
+3. :material-alert: **Log Level** - Maps the syslog log level to the `detected_level` label.
 
 Restart Alloy to pick up the new configuration:
 
@@ -182,9 +182,23 @@ Add the following configuration to your `prometheus.yml`:
         replacement: 192.168.1.1:9115 # (3)!
 ```
 
-1. Target for Blackbox Exporter to ping.
-2. Label to identify the system across the different scrape jobs.
-3. Replace `192.168.1.1:9115` with your router IP and metrics port.
+1. :material-target: **Targets** - Target for Blackbox Exporter to ping.
+2. :material-tag: **Label** - Label to identify the system across the different scrape jobs.
+3. :material-router-network: **Exporter Address** - Replace `192.168.1.1:9115` with your router IP and metrics port.
+
+## Verification
+
+**Check Alloy components:**
+
+Open the Alloy Web UI and verify the `loki.source.syslog` component is healthy.
+
+**Verify logs in Grafana:**
+
+Query for VyOS logs in Grafana's Explore view using LogQL:
+
+```logql
+{job="vyos"}
+```
 
 ## Grafana Dashboard
 

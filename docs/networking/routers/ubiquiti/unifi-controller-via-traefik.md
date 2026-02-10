@@ -1,5 +1,5 @@
 ---
-title: Unifi Controller via Traefik 
+title: Controller via Traefik
 description: Proxy Unifi Controller through Traefik using file-based configuration
 tags:
 - unifi
@@ -26,8 +26,8 @@ command:
   # ... your other Traefik arguments
 ```
 
-1. Points Traefik to dynamic config files for non-Docker services
-2. Enables automatic reload on config changes
+1. :material-folder-cog: **File Provider** - Points Traefik to dynamic config files for non-Docker services
+2. :material-refresh: **Watch Mode** - Enables automatic reload on config changes
 
 **Volume mounts:**
 ```yaml title="docker-compose.yml" hl_lines="4"
@@ -37,7 +37,7 @@ volumes:
   - ./config:/etc/traefik/dynamic:ro # (1)!
 ```
 
-1. Maps the local config directory to Traefik’s dynamic path (read-only)
+1. :material-folder: **Config Volume** - Maps the local config directory to Traefik's dynamic path (read-only)
 
 ### Create Dynamic Configuration File
 
@@ -66,13 +66,13 @@ http:
       insecureSkipVerify: true # (7)!
 ```
 
-1. The domain that will route to your Unifi Controller
-2. References the service definition below for backend routing
-3. Uses the `websecure` entry point for HTTPS traffic
-4. Uses Let's Encrypt (`le`) to provide valid SSL certificates to clients
-5. The IP address and protocol of your Unifi Controller (replace `192.168.1.1` with your controller's IP)
-6. References the custom transport configuration that handles SSL verification
-7. Set to `true` because Unifi Controller uses self-signed certificates internally.
+1. :material-web: **Host Rule** - The domain that will route to your Unifi Controller
+2. :material-arrow-right: **Service** - References the service definition below for backend routing
+3. :material-lock: **Entry Point** - Uses the `websecure` entry point for HTTPS traffic
+4. :material-certificate: **TLS Resolver** - Uses Let's Encrypt (`le`) to provide valid SSL certificates to clients
+5. :material-server: **Backend URL** - The IP address and protocol of your Unifi Controller (replace `192.168.1.1` with your controller's IP)
+6. :material-transit-connection: **Transport** - References the custom transport configuration that handles SSL verification
+7. :material-shield-off: **Skip Verify** - Set to `true` because Unifi Controller uses self-signed certificates internally.
 
 ## Apply Configuration
 
