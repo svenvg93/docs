@@ -5,6 +5,9 @@
 site_name = "Tech Documentation"
 site_description = "Comprehensive guides for self-hosting, infrastructure, automation, and monitoring."
 site_author = "Sven van Ginkel"
+repo_url = "https://github.com/svenvg93/docs"
+repo_name = "svenvg93/docs"
+repo = "fontawesome/brands/github"
 # site_url = "https://your-domain.com/"
 extra_css = ["stylesheets/extra.css"]
 

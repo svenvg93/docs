@@ -149,7 +149,7 @@ set service monitoring prometheus blackbox-exporter modules icmp name icmp prefe
 Enable the Blackbox Exporter so Prometheus can scrape the probe results.In this example, we configure ICMP (ping) checks only to measure basic connectivity and latency.
 Add the following configuration to your `prometheus.yml`:
 
-```yaml title="prometheus.yml" hl_lines="6 7 8 9 10 11 12 13 14 15 23 27 "
+```yaml title="prometheus.yml" hl_lines="6 7 8 9 10 11 12 13 14 15 23 27"
   - job_name: 'blackbox_icmp'
     scrape_interval: 15s
     metrics_path: /probe
