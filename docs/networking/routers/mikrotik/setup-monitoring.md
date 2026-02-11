@@ -240,12 +240,12 @@ Enable remote syslog forwarding on the router:
 
 ```bash hl_lines="2 3"
 /system logging action
-set remote address=192.168.1.101 port=1514 remote-port=1514 bsd-syslog=yes syslog-facility=local0 # (1)!
+add name=loki remote=172.16.10.2 remote-log-format=syslog syslog-facility=local0 target=remote # (1)!
 /system logging
-add action=remote topics=info # (2)!
-add action=remote topics=warning
-add action=remote topics=error
-add action=remote topics=critical
+add action=loki topics=info # (2)!
+add action=loki topics=warning
+add action=loki topics=error
+add action=loki topics=critical
 ```
 
 1. :material-server-network: **Remote Address** - Replace `192.168.1.101` with the IP of your Alloy instance and `1514` with the port Alloy is listening on
@@ -256,7 +256,7 @@ add action=remote topics=critical
 
     ```bash
     /system logging
-    add action=remote topics=firewall
+    add action=loki topics=firewall
     ```
 
     You also need firewall rules that use the `log=yes` option:
@@ -301,7 +301,7 @@ loki.relabel "mikrotik_syslog" {
 
 loki.source.syslog "mikrotik" {
   listener {
-    address            = "0.0.0.0:1514" // (4)!
+    address            = "0.0.0.0:514" // (4)!
     protocol           = "udp"
     syslog_format      = "rfc3164"
     use_incoming_timestamp = false
