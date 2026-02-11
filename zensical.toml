@@ -16,7 +16,6 @@ copyright = "Copyright &copy; 2024-2026 Sven van Ginkel"
 nav = [
   {"Home" = "index.md"},
   {"Observability" = [
-    "observability/index.md",
     {"Tools" = [
       "observability/tools/install-alloy.md",
       "observability/tools/install-grafana.md",
@@ -31,7 +30,6 @@ nav = [
     ]},
   ]},
   {"Networking" = [
-    "networking/index.md",
     {"Routers" = [
       {"Ubiquiti" = [
         "networking/routers/ubiquiti/unifi-controller-via-traefik.md",
@@ -45,6 +43,7 @@ nav = [
       ]},
       {"GL.iNet" = [
         "networking/routers/gl-inet/travel-router-setup.md",
+   #     "networking/routers/gl-inet/setup-monitoring.md",
       ]},
       {"VyOS" = [
         "networking/routers/vyos/install-setup.md",
@@ -66,7 +65,6 @@ nav = [
     ]},
   ]},
   {"Automation" = [
-    "automation/index.md",
     {"Ansible" = [
       "automation/ansible/install-setup.md",
       "automation/ansible/playbooks-roles-handlers.md",
