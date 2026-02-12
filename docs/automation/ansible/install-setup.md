@@ -144,21 +144,6 @@ ansible-playbook playbooks/install-htop.yml --ask-become-pass
 !!! tip ""
     If your user has passwordless sudo, you can skip the `--ask-become-pass` flag.
 
-## Recap
-
-You’ve now:
-
-- Installed Ansible
-- Set up SSH key access to your servers
-- Created a clean project structure
-- Written and executed a basic playbook
-
-## What’s Next
-
-In the next parts of this series, we’ll cover:
-- Organizing your automation with roles
-- Reacting to changes using handlers
-- Managing secrets securely with Ansible Vault
 
 You’re now ready to scale up your homelab automation. Let's continue.
 

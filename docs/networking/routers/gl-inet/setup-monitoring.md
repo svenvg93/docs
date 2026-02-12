@@ -10,6 +10,9 @@ tags:
 
 GL.iNet routers run OpenWRT, which has native [Prometheus exporter] packages available. This guide covers installing the Prometheus node exporter on the router for metrics collection, and forwarding syslog messages to Loki via Grafana Alloy.
 
+!!! note "Also works on standard OpenWRT"
+    This guide is written for GL.iNet routers, but the same steps apply to any router running standard OpenWRT.
+
 ??? info "Prerequisites"
     This guide assumes you already have Grafana, Alloy, Prometheus, and Loki set up. See the following guides:
 
@@ -24,22 +27,33 @@ OpenWRT provides a lightweight Lua-based Prometheus node exporter with modular c
 
 ### GL.iNet
 
-SSH into your GL.iNet router and install the exporter packages:
+Install the Prometheus node exporter and collector packages on your router, then configure the exporter to listen on the LAN interface.
 
-```bash
-opkg update
-opkg install prometheus-node-exporter-lua \
-  prometheus-node-exporter-lua-openwrt \
-  prometheus-node-exporter-lua-wifi \
-  prometheus-node-exporter-lua-wifi_stations \
-  prometheus-node-exporter-lua-netstat \
-  prometheus-node-exporter-lua-nat_traffic \
-  prometheus-node-exporter-lua-thermal \
-  prometheus-node-exporter-lua-hwmon \
-  prometheus-node-exporter-lua-uci_dhcp_host
-```
+=== "GL.iNet Admin Panel"
+
+    1. Navigate to **Admin Panel**
+    2. Go to **Applications** → **Plug-ins**
+    3. Click **Update** to refresh the package index
+    4. Search for and install each of the following packages:
+
+=== "SSH"
+
+    ```bash
+    opkg update
+    opkg install prometheus-node-exporter-lua \
+      prometheus-node-exporter-lua-openwrt \
+      prometheus-node-exporter-lua-wifi \
+      prometheus-node-exporter-lua-wifi_stations \
+      prometheus-node-exporter-lua-netstat \
+      prometheus-node-exporter-lua-nat_traffic \
+      prometheus-node-exporter-lua-thermal \
+      prometheus-node-exporter-lua-hwmon \
+      prometheus-node-exporter-lua-uci_dhcp_host
+    ```
 
 ??? note "Available collector packages"
+    Install only the packages relevant to your setup. The core package is required, the rest are optional.
+
     | Package | Description |
     | ------- | ----------- |
     | `prometheus-node-exporter-lua` | Core exporter with CPU, memory, disk, and network metrics |
@@ -51,8 +65,6 @@ opkg install prometheus-node-exporter-lua \
     | `prometheus-node-exporter-lua-thermal` | Thermal zone temperatures |
     | `prometheus-node-exporter-lua-hwmon` | Hardware sensor readings |
     | `prometheus-node-exporter-lua-uci_dhcp_host` | DHCP host information |
-
-    Install only the packages relevant to your setup. The core package is required, the rest are optional.
 
 By default, the exporter only listens on localhost. Update it to listen on the LAN interface so Prometheus can scrape it:
 
@@ -115,7 +127,7 @@ You can configure remote syslog either via the LuCI web interface or via SSH.
     5. Set **Log output level** to **Info**
     6. Click **Save & Apply**
 
-=== "SSH (UCI)"
+=== "SSH"
 
     ```bash hl_lines="1 2 3 4"
     uci set system.@system[0].log_ip='192.168.8.101' # (1)!
@@ -130,6 +142,10 @@ You can configure remote syslog either via the LuCI web interface or via SSH.
     2. :material-network: **Port** - The port Alloy is listening on for syslog messages
     3. :material-protocol: **Protocol** - Transport protocol for syslog forwarding
     4. :material-filter: **Log Level** - Log verbosity level (7 = debug, 6 = info, 4 = warning, 3 = error)
+
+??? tip "Access LuCI"
+    LuCI is not installed by default on GL.iNet routers. To install it, navigate to **Admin Panel** → **System** → **Advanced Settings**.
+
 
 ### Grafana Alloy
 
@@ -217,6 +233,13 @@ Query for GL.iNet logs in Grafana's Explore view using LogQL:
 {job="glinet"}
 ```
 
+## Grafana Dashboard
+
+Now that metrics and logs are flowing, you can visualize them in Grafana. You can either create a custom dashboard or import a pre-built one:
+
+- [GL.iNet Dashboard] - Pre-built dashboard for GL.iNet / OpenWRT routers
+
+[GL.iNet Dashboard]: https://github.com/svenvg93/Grafana-Dashboard/tree/master/openwrt
 [Install Alloy]: ../../../observability/tools/install-alloy.md
 [Install Loki]: ../../../observability/tools/install-loki.md
 [Install Prometheus]: ../../../observability/tools/install-prometheus.md

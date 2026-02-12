@@ -43,7 +43,7 @@ nav = [
       ]},
       {"GL.iNet" = [
         "networking/routers/gl-inet/travel-router-setup.md",
-   #     "networking/routers/gl-inet/setup-monitoring.md",
+        "networking/routers/gl-inet/setup-monitoring.md",
       ]},
       {"VyOS" = [
         "networking/routers/vyos/install-setup.md",
@@ -97,8 +97,8 @@ features = [
   "navigation.instant.prefetch",
   "navigation.path",
   "navigation.sections",
-#  "navigation.tabs",
-#  "navigation.tabs.sticky",
+  "navigation.tabs",
+  "navigation.tabs.sticky",
   "navigation.top",
   "navigation.tracking",
   "search.highlight",
@@ -126,6 +126,6 @@ toggle.name = "Switch to light mode"
 # logo = "lucide/smile"
 
 # Uncomment to add social links
-# [[project.extra.social]]
-# icon = "fontawesome/brands/github"
-# link = "https://github.com/svenvg93"
+[[project.extra.social]]
+ icon = "fontawesome/brands/github"
+ link = "https://github.com/svenvg93"
