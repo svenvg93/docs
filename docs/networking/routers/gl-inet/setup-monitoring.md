@@ -165,7 +165,7 @@ loki.relabel "glinet_syslog" {
 
 loki.source.syslog "glinet" {
   listener {
-    address            = "0.0.0.0:1514" // (4)!
+    address            = "0.0.0.0:514" // (4)!
     protocol           = "udp"
     syslog_format      = "rfc3164"
     use_incoming_timestamp = false
